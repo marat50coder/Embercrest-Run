@@ -28,7 +28,13 @@ workflows:
 
     scripts:
       - name: Disable Swift Package Manager (Firebase pulled via CocoaPods)
-        script: flutter config --no-enable-swift-package-manager
+        script: |
+          flutter config --no-enable-swift-package-manager
+          # Wipe any SPM residue that a previous Flutter run may have added.
+          rm -rf ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          rm -rf ios/Runner.xcworkspace/xcshareddata/swiftpm
+          rm -rf build/ios/SourcePackages
+          rm -rf ~/Library/Developer/Xcode/DerivedData
 
       - name: Install Flutter dependencies
         script: flutter pub get
