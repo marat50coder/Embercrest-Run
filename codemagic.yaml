@@ -16,7 +16,8 @@ workflows:
       vars:
         BUNDLE_ID: com.embercrest.rungame
         NSE_BUNDLE_ID: com.embercrest.rungame.NotificationService
-        APP_STORE_APPLE_ID: "YOUR_APP_STORE_APPLE_ID"
+        APP_STORE_APPLE_ID: "6792816894"
+        APPLE_TEAM_ID: "T72S4TZ35D"
 
     triggering:
       events:
@@ -26,11 +27,16 @@ workflows:
           include: true
 
     scripts:
+      - name: Disable Swift Package Manager (Firebase pulled via CocoaPods)
+        script: flutter config --no-enable-swift-package-manager
+
       - name: Install Flutter dependencies
         script: flutter pub get
 
       - name: Install CocoaPods
-        script: pod install
+        script: |
+          rm -rf Pods .symlinks Podfile.lock
+          pod install
         working_directory: ios
 
       - name: Code signing & Build IPA
