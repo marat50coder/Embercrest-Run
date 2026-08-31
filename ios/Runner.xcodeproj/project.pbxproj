@@ -220,7 +220,6 @@
 				9A64C1FAF9586C8565141090 /* Pods-EmberMediaService.release.xcconfig */,
 				1B04D8707766FEDA94EAD323 /* Pods-EmberMediaService.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};

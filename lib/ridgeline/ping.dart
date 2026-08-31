@@ -2,17 +2,16 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'crest_vault.dart';
+import 'locker.dart';
+import 'note.dart';
 
 @pragma('vm:entry-point')
-Future<void> embBackgroundMessage(RemoteMessage _) async {}
+Future<void> riftBackgroundPing(RemoteMessage _) async {}
 
-/// Firebase Cloud Messaging / APNs bootstrap: initial-message capture, token
-/// refresh, foreground presentation and push-tap URL extraction.
-class PushHub {
-  PushHub(this._vault, {required this.enabled});
+class PingRelay {
+  PingRelay(this._locker, {required this.enabled});
 
-  final CrestVault _vault;
+  final TrailLocker _locker;
   final bool enabled;
   FirebaseMessaging? _messaging;
   Future<void>? _bootFuture;
@@ -30,14 +29,18 @@ class PushHub {
     if (!enabled) return;
     final messaging = FirebaseMessaging.instance;
     _messaging = messaging;
-    final initial = await messaging.getInitialMessage().timeout(
-      const Duration(seconds: 4),
-      onTimeout: () => null,
-    );
-    final initialUrl = initial == null ? null : _extract(initial.data);
-    if (initialUrl != null) await _vault.stashPushUrl(initialUrl);
+    try {
+      final initial = await messaging.getInitialMessage().timeout(
+        const Duration(seconds: 4),
+        onTimeout: () => null,
+      );
+      final initialUrl = initial == null ? null : _extract(initial.data);
+      if (initialUrl != null) await _locker.stashPushUrl(initialUrl);
+    } catch (error) {
+      riftNote(() => '[RIFT.PING] initial message failed: $error');
+    }
 
-    FirebaseMessaging.onBackgroundMessage(embBackgroundMessage);
+    FirebaseMessaging.onBackgroundMessage(riftBackgroundPing);
     await messaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
@@ -52,13 +55,26 @@ class PushHub {
       if (url == null) return;
       final callback = onDestination;
       if (callback == null) {
-        _vault.stashPushUrl(url);
+        _locker.stashPushUrl(url);
       } else {
         callback(url);
       }
     });
-    await _waitForApns();
-    _token = await messaging.getToken();
+    await _refreshToken();
+  }
+
+  Future<void> _refreshToken({int attempts = 6}) async {
+    final messaging = _messaging;
+    if (messaging == null) return;
+    await _waitForApns(attempts: attempts);
+    try {
+      _token = await messaging.getToken();
+      if (_token?.isNotEmpty ?? false) {
+        onTokenChanged?.call(_token!);
+      }
+    } catch (error) {
+      riftNote(() => '[RIFT.PING] getToken failed: $error');
+    }
   }
 
   String? _extract(Map<String, dynamic> payload) {
@@ -94,13 +110,19 @@ class PushHub {
   }
 
   Future<bool> canOfferPermission() async {
-    if (!enabled || _vault.pushDeniedByOs) return false;
+    if (!enabled || _locker.pingBlockedByOs) return false;
+    try {
+      await boot();
+    } catch (error) {
+      riftNote(() => '[RIFT.PING] boot before offer failed: $error');
+      return false;
+    }
     final messaging = _messaging;
     if (messaging == null) return false;
     final status =
         (await messaging.getNotificationSettings()).authorizationStatus;
     if (status == AuthorizationStatus.denied) {
-      await _vault.markPushDeniedByOs();
+      await _locker.markPingBlockedByOs();
       return false;
     }
     return status == AuthorizationStatus.notDetermined ||
@@ -114,7 +136,14 @@ class PushHub {
   }
 
   Future<bool> _performPermissionRequest() async {
-    if (!enabled || _messaging == null) return false;
+    if (!enabled) return false;
+    try {
+      await boot();
+    } catch (error) {
+      riftNote(() => '[RIFT.PING] boot before ask failed: $error');
+      return false;
+    }
+    if (_messaging == null) return false;
     final result = await _messaging!.requestPermission(
       alert: true,
       badge: true,
@@ -124,14 +153,12 @@ class PushHub {
     final accepted =
         result.authorizationStatus == AuthorizationStatus.authorized ||
         result.authorizationStatus == AuthorizationStatus.provisional;
-    await _vault.setPushAllowed(accepted);
+    await _locker.setPingAllowed(accepted);
     if (!accepted && result.authorizationStatus == AuthorizationStatus.denied) {
-      await _vault.markPushDeniedByOs();
+      await _locker.markPingBlockedByOs();
     }
     if (accepted) {
-      await _waitForApns(attempts: 14);
-      _token = await _messaging!.getToken();
-      if (_token?.isNotEmpty ?? false) onTokenChanged?.call(_token!);
+      await _refreshToken(attempts: 14);
     }
     return accepted;
   }

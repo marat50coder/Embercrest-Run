@@ -3,7 +3,7 @@ import UIKit
 import UserNotifications
 
 class SceneDelegate: FlutterSceneDelegate {
-  static let launchRouteKey = "flutter.emb_tap_route"
+  static let launchRouteKey = "flutter.rift_wake_link"
 
   override func scene(
     _ scene: UIScene,
@@ -24,7 +24,7 @@ class SceneDelegate: FlutterSceneDelegate {
     defaults.synchronize()
 
     #if DEBUG
-    NSLog("[EMB.ROUTE] captured notification destination")
+    NSLog("[RIFT.WAKE] captured notification destination")
     #endif
   }
 

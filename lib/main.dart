@@ -1,75 +1,74 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'core/palette.dart';
-import 'emberway/config/ember_gate_config.dart';
-import 'emberway/core/ember_log.dart';
-import 'emberway/crest_coordinator.dart';
-import 'emberway/infra/crest_vault.dart';
-import 'emberway/infra/ember_attribution.dart';
-import 'emberway/infra/gate_exchange.dart';
-import 'emberway/infra/net_watch.dart';
-import 'emberway/infra/push_hub.dart';
-import 'emberway/infra/ua_client.dart';
-import 'emberway/pages/ember_boot.dart';
+import 'ridgeline/arbiter.dart';
+import 'ridgeline/awake.dart';
+import 'ridgeline/ledger.dart';
+import 'ridgeline/locker.dart';
+import 'ridgeline/mask.dart';
+import 'ridgeline/note.dart';
+import 'ridgeline/pact.dart';
+import 'ridgeline/ping.dart';
+import 'ridgeline/pulse.dart';
+import 'ridgeline/wire.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Loading is allowed in either orientation; the game locks to landscape once
-  // the menu appears.
   await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  final vault = CrestVault();
-  final agent = UaClient();
+  final locker = TrailLocker();
+  final mask = SafariMask();
   await Future.wait<void>(<Future<void>>[
-    vault.initialize(),
-    agent.prepare(),
+    locker.open(),
+    mask.warm(),
   ]);
 
-  embTrace(
-    () => '[EMB.BOOT] credentialsReady=${EmberGateConfig.grayCredentialsReady} '
-        'endpoint=${EmberGateConfig.endpoint} '
-        'afKeyLen=${EmberGateConfig.appsFlyerKey.length} '
-        'fbNum=${EmberGateConfig.firebaseProjectNumber}',
+  riftNote(
+    () => '[RIFT.BOOT] pactReady=${RidgePact.pactReady} '
+        'endpoint=${RidgePact.endpoint} '
+        'afKeyLen=${RidgePact.appsFlyerKey.length} '
+        'fbNum=${RidgePact.firebaseProjectNumber}',
   );
 
   var productionServicesReady = false;
-  if (EmberGateConfig.grayCredentialsReady) {
+  if (RidgePact.pactReady) {
     try {
       await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(riftBackgroundPing);
       productionServicesReady = true;
-      embTrace(() => '[EMB.BOOT] Firebase.initializeApp OK');
+      riftNote(() => '[RIFT.BOOT] Firebase.initializeApp OK');
     } catch (error) {
-      embTrace(() => '[EMB.BOOT] Firebase.initializeApp failed: $error');
+      riftNote(() => '[RIFT.BOOT] Firebase.initializeApp failed: $error');
     }
   } else {
-    embTrace(() => '[EMB.BOOT] gate DISABLED — white game only.');
+    riftNote(() => '[RIFT.BOOT] pact closed — native play only.');
   }
 
-  final watch = NetWatch();
-  // Attribution + config POST run even if Firebase failed; only push needs it.
-  final push = PushHub(vault, enabled: productionServicesReady);
-  final attribution = EmberAttribution(agent);
-  final coordinator = CrestCoordinator(
-    vault: vault,
-    watch: watch,
-    attribution: attribution,
-    exchange: GateExchange(agent, vault),
-    push: push,
-    agent: agent,
-    runtimeEnabled: EmberGateConfig.grayCredentialsReady,
+  final pulse = LinkPulse();
+  final ping = PingRelay(locker, enabled: productionServicesReady);
+  final ledger = FlightLedger(mask);
+  final arbiter = TrailArbiter(
+    locker: locker,
+    pulse: pulse,
+    ledger: ledger,
+    wire: PactWire(mask, locker),
+    ping: ping,
+    mask: mask,
+    runtimeEnabled: RidgePact.pactReady,
   );
 
-  runApp(EmbercrestApp(coordinator: coordinator));
+  runApp(EmbercrestApp(arbiter: arbiter));
 }
 
 class EmbercrestApp extends StatelessWidget {
-  const EmbercrestApp({super.key, this.coordinator});
+  const EmbercrestApp({super.key, this.arbiter});
 
-  final CrestCoordinator? coordinator;
+  final TrailArbiter? arbiter;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +92,7 @@ class EmbercrestApp extends StatelessWidget {
           },
         ),
       ),
-      home: EmberBoot(coordinator: coordinator),
+      home: RidgeAwake(arbiter: arbiter),
     );
   }
 }

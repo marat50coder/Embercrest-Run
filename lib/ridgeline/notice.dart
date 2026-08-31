@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../config/ember_gate_config.dart';
-import '../infra/crest_vault.dart';
-import '../infra/push_hub.dart';
+import 'locker.dart';
+import 'pact.dart';
+import 'ping.dart';
 
-/// Push opt-in screen, shown once before the WebView on the first gray entry.
-class PushPermitScreen extends StatefulWidget {
-  const PushPermitScreen({
+class NoticePermit extends StatefulWidget {
+  const NoticePermit({
     super.key,
-    required this.vault,
-    required this.push,
+    required this.locker,
+    required this.ping,
     required this.nextBuilder,
     this.onTokenReady,
   });
 
-  final CrestVault vault;
-  final PushHub push;
+  final TrailLocker locker;
+  final PingRelay ping;
   final WidgetBuilder nextBuilder;
   final Future<void> Function(String token)? onTokenReady;
 
   @override
-  State<PushPermitScreen> createState() => _PushPermitScreenState();
+  State<NoticePermit> createState() => _NoticePermitState();
 }
 
-class _PushPermitScreenState extends State<PushPermitScreen> {
+class _NoticePermitState extends State<NoticePermit> {
   bool _working = false;
 
   @override
@@ -41,8 +40,8 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
   Future<void> _accept() async {
     if (_working) return;
     setState(() => _working = true);
-    final granted = await widget.push.askPermission();
-    final token = widget.push.token;
+    final granted = await widget.ping.askPermission();
+    final token = widget.ping.token;
     if (granted && token != null && token.isNotEmpty) {
       await widget.onTokenReady?.call(token);
     }
@@ -59,8 +58,8 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
 
   Future<void> _snooze() {
     final until = DateTime.now().millisecondsSinceEpoch ~/ 1000 +
-        EmberGateConfig.pushSnoozeSeconds;
-    return widget.vault.snoozePushInvite(until);
+        RidgePact.noticeSnoozeSeconds;
+    return widget.locker.snoozeNotice(until);
   }
 
   void _continue() {
@@ -74,10 +73,8 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
     final media = MediaQuery.of(context);
     final landscape = media.orientation == Orientation.landscape;
     final background = landscape
-        ? 'assets/Horizontal_Notifications_Screen.webp'
-        : 'assets/Vertical_Notifications_Screen.webp';
-    // Landscape (Horizontal_Notifications_Screen) buttons are 25% smaller than
-    // the portrait ones so they sit better on the wide artwork.
+        ? 'assets/magma_notice_wide.webp'
+        : 'assets/magma_notice_tall.webp';
     final width = landscape
         ? (media.size.width * 0.315).clamp(240.0, 420.0)
         : (media.size.width * 0.80).clamp(280.0, 440.0);
@@ -95,6 +92,7 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
             background,
             fit: BoxFit.cover,
             filterQuality: FilterQuality.high,
+            errorBuilder: (_, _, _) => const ColoredBox(color: Colors.black),
           ),
           Align(
             alignment: Alignment(0, landscape ? 0.80 : 0.90),
@@ -102,7 +100,7 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                _PermitButton(
+                _NoticeChip(
                   width: width,
                   height: acceptH,
                   fontSize: acceptFont,
@@ -112,7 +110,7 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
                   onTap: _accept,
                 ),
                 SizedBox(height: landscape ? 12 : 16),
-                _PermitButton(
+                _NoticeChip(
                   width: width * 0.9,
                   height: skipH,
                   fontSize: skipFont,
@@ -130,8 +128,8 @@ class _PushPermitScreenState extends State<PushPermitScreen> {
   }
 }
 
-class _PermitButton extends StatelessWidget {
-  const _PermitButton({
+class _NoticeChip extends StatelessWidget {
+  const _NoticeChip({
     required this.width,
     required this.height,
     required this.fontSize,
@@ -160,15 +158,12 @@ class _PermitButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(radius),
           gradient: LinearGradient(
             colors: emphasized
-                ? const <Color>[Color(0xFFFFC24A), Color(0xFFFF7A18)]
-                : const <Color>[Color(0xFFFF9A3D), Color(0xFFD8380B)],
+                ? const <Color>[Color(0xFFFFB84A), Color(0xFFF06A12)]
+                : const <Color>[Color(0xFFFF8C32), Color(0xFFC42A08)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          border: Border.all(color: const Color(0xFF5A2410), width: 3),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(color: Colors.black45, blurRadius: 12, offset: Offset(0, 5)),
-          ],
+          border: Border.all(color: const Color(0xFF4A1C0C), width: 2.5),
         ),
         child: Material(
           color: Colors.transparent,
@@ -181,14 +176,14 @@ class _PermitButton extends StatelessWidget {
                       dimension: 26,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.6,
-                        color: Color(0xFF3A1608),
+                        color: Color(0xFF2E1206),
                       ),
                     )
                   : Text(
                       label,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: const Color(0xFF3A1608),
+                        color: const Color(0xFF2E1206),
                         fontSize: fontSize,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.6,

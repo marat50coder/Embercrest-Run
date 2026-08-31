@@ -39,7 +39,7 @@ end
 target 'EmberMediaService' do
   use_frameworks!
   platform :ios, '15.0'
-  pod 'Firebase/Messaging', '12.17.0'
+  pod 'Firebase/Messaging', '12.15.0'
 end
 
 post_install do |installer|

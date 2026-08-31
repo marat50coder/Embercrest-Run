@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-/// Connectivity interface check + DNS reachability probe.
-class NetWatch {
+/// Interface check plus a short DNS probe against public Apple hosts.
+class LinkPulse {
   final Connectivity _connectivity = Connectivity();
 
   Future<bool> hasInterface() async {
@@ -15,22 +15,17 @@ class NetWatch {
     }
   }
 
-  /// Time-boxed reachability check against well-known hosts (not our own
-  /// domain) so a VPN or a not-yet-propagated app domain never yields a false
-  /// "offline", and Retry can never hang forever.
   Future<bool> canReachNetwork() async {
     if (!await hasInterface()) return false;
-    for (final host in const <String>['apple.com', 'icloud.com']) {
+    for (final host in const <String>['captive.apple.com', 'www.apple.com']) {
       try {
         final records = await InternetAddress.lookup(
           host,
-        ).timeout(const Duration(seconds: 3));
+        ).timeout(const Duration(seconds: 4));
         if (records.any((record) => record.rawAddress.isNotEmpty)) {
           return true;
         }
-      } catch (_) {
-        // Try the next host before declaring offline.
-      }
+      } catch (_) {}
     }
     return false;
   }

@@ -6,7 +6,7 @@ import '../core/audio.dart';
 import '../core/palette.dart';
 import '../core/save.dart';
 import '../game/config.dart';
-import '../ui/widgets.dart';
+import '../ui/loading_mark.dart';
 import 'menu_screen.dart';
 
 /// Boots the game while showing the artwork that matches the current
@@ -20,9 +20,9 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  double _progress = 0;
-  String _status = 'Waking the volcano';
   SpriteAtlas? _atlas;
+  bool _ready = false;
+  bool _opened = false;
 
   @override
   void initState() {
@@ -30,17 +30,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     _boot();
   }
 
-  Future<void> _step(double to, String status, Future<void> Function() work) async {
-    if (!mounted) return;
-    setState(() => _status = status);
-    await work();
-    if (!mounted) return;
-    setState(() => _progress = to);
-    // A beat between steps so the bar reads as progress rather than a jump.
-    await Future<void>.delayed(const Duration(milliseconds: 120));
-  }
-
-  /// Decodes the artwork the menu shows first, so it never pops in late.
   Future<void> _precacheArt() async {
     await precacheImage(const AssetImage('assets/Game_Name.webp'), context);
     if (!mounted) return;
@@ -48,34 +37,35 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> _boot() async {
-    late Save save;
-    await _step(0.15, 'Reading the ledger', () async {
-      save = await Save.load();
-    });
-
-    await _step(0.35, 'Lighting the speakers', () async {
-      await Audio.instance.init(music: save.musicOn, sfx: save.sfxOn);
-    });
-
-    await _step(0.72, 'Carving the crest', () async {
-      _atlas = await SpriteAtlas.load();
-    });
-
+    final save = await Save.load();
     if (!mounted) return;
-    setState(() => _status = 'Warming the embers');
+
+    await Audio.instance.init(music: save.musicOn, sfx: save.sfxOn);
+    if (!mounted) return;
+
+    _atlas = await SpriteAtlas.load();
+    if (!mounted) return;
+
     await _precacheArt();
     if (!mounted) return;
-    setState(() => _progress = 0.88);
 
-    await _step(1.0, 'Ready', () async {
-      await Audio.instance.preload(const [
-        Sfx.click, Sfx.resource, Sfx.rareResource, Sfx.coreActivation,
-        Sfx.pathCollapse, Sfx.freshMagma, Sfx.startRun, Sfx.gameOver,
-      ]);
-    });
-
+    await Audio.instance.preload(const [
+      Sfx.click,
+      Sfx.resource,
+      Sfx.rareResource,
+      Sfx.coreActivation,
+      Sfx.pathCollapse,
+      Sfx.freshMagma,
+      Sfx.startRun,
+      Sfx.gameOver,
+    ]);
     if (!mounted) return;
-    // From here on the game is landscape only.
+    setState(() => _ready = true);
+  }
+
+  Future<void> _openMenu() async {
+    if (_opened || _atlas == null || !mounted) return;
+    _opened = true;
     await SystemChrome.setPreferredOrientations(const [
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -96,17 +86,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
     final portrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final art = portrait
-        ? 'assets/Vertical_Loading_Screen.webp'
-        : 'assets/Horizontal_Loading_Screen.webp';
+        ? 'assets/magma_boot_tall.webp'
+        : 'assets/magma_boot_wide.webp';
+    final screenW = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: Pal.ash,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Both artworks are full-bleed; cover keeps them uncropped on the
-          // long axis whichever way the device is held.
-          Image.asset(art, fit: BoxFit.cover, filterQuality: FilterQuality.medium),
+          Image.asset(
+            art,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.medium,
+          ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -116,30 +109,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
               ),
             ),
           ),
-          const EmberField(count: 22),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: EdgeInsets.only(bottom: portrait ? 74 : 34),
               child: SizedBox(
-                width: portrait ? 300 : 420,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(_status.toUpperCase(),
-                        style: Pal.label(12, color: Pal.muted)),
-                    const SizedBox(height: 10),
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0, end: _progress),
-                      duration: const Duration(milliseconds: 420),
-                      curve: Curves.easeOut,
-                      builder: (_, v, _) =>
-                          MeterBar(value: v, color: Pal.ember, height: 10),
-                    ),
-                    const SizedBox(height: 12),
-                    Text('EMBERCREST RUN',
-                        style: Pal.label(13, color: Pal.emberBright)),
-                  ],
+                width: portrait ? screenW * 0.72 : screenW * 0.44,
+                child: LoadingMark(
+                  ready: _ready,
+                  onFilled: _openMenu,
                 ),
               ),
             ),

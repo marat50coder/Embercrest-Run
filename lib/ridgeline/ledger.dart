@@ -7,16 +7,14 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import '../config/ember_gate_config.dart';
-import '../core/ember_log.dart';
-import 'ua_client.dart';
+import 'mask.dart';
+import 'note.dart';
+import 'pact.dart';
 
-/// AppsFlyer attribution: warms up the SDK, waits for install-conversion +
-/// deep-link signals, and composes the flat config-endpoint body.
-class EmberAttribution {
-  EmberAttribution(this._agent);
+class FlightLedger {
+  FlightLedger(this._mask);
 
-  final UaClient _agent;
+  final SafariMask _mask;
   AppsflyerSdk? _sdk;
   Map<String, dynamic>? _install;
   Map<String, dynamic>? _reopen;
@@ -28,7 +26,7 @@ class EmberAttribution {
   Future<void> start() => _startFuture ??= _start();
 
   Future<void> _start() async {
-    if (!EmberGateConfig.grayCredentialsReady) {
+    if (!RidgePact.pactReady) {
       _completeEmpty();
       return;
     }
@@ -36,10 +34,10 @@ class EmberAttribution {
       await _requestTrackingIfNeeded();
       final sdk = AppsflyerSdk(
         AppsFlyerOptions(
-          afDevKey: EmberGateConfig.appsFlyerKey,
-          appId: EmberGateConfig.iosStoreId,
+          afDevKey: RidgePact.appsFlyerKey,
+          appId: RidgePact.iosStoreId,
           showDebug: kDebugMode,
-          timeToWaitForATTUserAuthorization: 4,
+          timeToWaitForATTUserAuthorization: 5,
         ),
       );
       _sdk = sdk;
@@ -56,7 +54,7 @@ class EmberAttribution {
         registerOnDeepLinkingCallback: true,
       );
     } catch (error) {
-      embTrace(() => '[EMB.FLIGHT] init failed: $error');
+      riftNote(() => '[RIFT.LEDGER] init failed: $error');
       _completeEmpty();
     }
   }
@@ -66,7 +64,7 @@ class EmberAttribution {
     final status = await AppTrackingTransparency.trackingAuthorizationStatus;
     if (status != TrackingStatus.notDetermined) return;
     await WidgetsBinding.instance.endOfFrame;
-    await Future<void>.delayed(const Duration(milliseconds: 320));
+    await Future<void>.delayed(const Duration(milliseconds: 410));
     await AppTrackingTransparency.requestTrackingAuthorization();
   }
 
@@ -74,26 +72,24 @@ class EmberAttribution {
     try {
       final received = _flat(raw);
       final status = received['status']?.toString().toLowerCase();
-      // AppsFlyer delivers {status:failure,...} when it cannot reach its
-      // servers (e.g. an ad-blocking VPN). Never merge that error map.
       final failed = status == 'failure' ||
           (received['af_status'] == null && received.containsKey('status'));
-      embTrace(
-        () => '[EMB.FLIGHT] conversion status=$status '
+      riftNote(
+        () => '[RIFT.LEDGER] conversion status=$status '
             'af_status=${received['af_status']} keys=${received.keys.toList()}',
       );
       if (failed) {
         _install = <String, dynamic>{};
       } else if (received['af_status'] == 'Organic') {
         await Future<void>.delayed(
-          const Duration(seconds: EmberGateConfig.organicRecheckSeconds),
+          const Duration(seconds: RidgePact.organicReplaySeconds),
         );
         _install = await _fetchGcd() ?? received;
       } else {
         _install = received;
       }
     } catch (error) {
-      embTrace(() => '[EMB.FLIGHT] conversion parse error: $error');
+      riftNote(() => '[RIFT.LEDGER] conversion parse error: $error');
       _install = <String, dynamic>{};
     } finally {
       if (!_installReady.isCompleted) _installReady.complete();
@@ -111,20 +107,19 @@ class EmberAttribution {
     final uid = await appsFlyerId();
     if (uid == null || uid.isEmpty) return null;
     try {
-      // iOS GCD uses the numeric App Store id, not the bundle id.
-      final base = EmberGateConfig.gcdBase;
+      final base = RidgePact.gcdBase;
       final sep = base.contains('?') ? '&' : '?';
       final uri = Uri.parse(
-        '$base${sep}app_id=${EmberGateConfig.iosStoreId}&device_id=$uid',
+        '$base${sep}app_id=${RidgePact.iosStoreId}&device_id=$uid',
       );
-      final response = await _agent
+      final response = await _mask
           .get(
             uri,
             headers: <String, String>{
-              'Authorization': 'Bearer ${EmberGateConfig.appsFlyerKey}',
+              'Authorization': 'Bearer ${RidgePact.appsFlyerKey}',
             },
           )
-          .timeout(const Duration(seconds: 12));
+          .timeout(const Duration(seconds: 14));
       if (response.statusCode != 200) return null;
       final decoded = jsonDecode(response.body);
       return decoded is Map ? Map<String, dynamic>.from(decoded) : null;
@@ -134,13 +129,13 @@ class EmberAttribution {
   }
 
   Future<void> awaitSignals({
-    Duration installTimeout = const Duration(seconds: 8),
+    Duration installTimeout = const Duration(seconds: 9),
   }) async {
     await start();
     await Future.wait<void>(<Future<void>>[
       _installReady.future.timeout(installTimeout, onTimeout: () {}),
       _deepLinkReady.future.timeout(
-        const Duration(seconds: 5),
+        const Duration(seconds: 6),
         onTimeout: () {},
       ),
     ]);
@@ -168,15 +163,15 @@ class EmberAttribution {
     }
 
     body['af_id'] = await appsFlyerId() ?? body['af_id'] ?? '';
-    body['bundle_id'] = EmberGateConfig.bundleId;
+    body['bundle_id'] = RidgePact.bundleId;
     body['os'] = 'iOS';
-    body['store_id'] = EmberGateConfig.storeToken;
+    body['store_id'] = RidgePact.storeToken;
     body['locale'] = locale;
     if (pushToken != null &&
         pushToken.isNotEmpty &&
-        EmberGateConfig.firebaseProjectNumber.isNotEmpty) {
+        RidgePact.firebaseProjectNumber.isNotEmpty) {
       body['push_token'] = pushToken;
-      body['firebase_project_id'] = EmberGateConfig.firebaseProjectNumber;
+      body['firebase_project_id'] = RidgePact.firebaseProjectNumber;
     }
 
     if (Platform.isIOS) {
@@ -190,7 +185,7 @@ class EmberAttribution {
         }
       } catch (_) {}
     }
-    embTrace(() => '[EMB.FLIGHT] payload ${jsonEncode(body)}');
+    riftNote(() => '[RIFT.LEDGER] payload ${jsonEncode(body)}');
     return body;
   }
 
