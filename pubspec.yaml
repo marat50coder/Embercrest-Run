@@ -1,7 +1,7 @@
 name: embercrest_run
 description: "Embercrest Run - grow a living magma road across a supervolcano."
 publish_to: 'none'
-version: 1.0.1+6
+version: 1.0.1+7
 
 environment:
   sdk: ^3.11.5
