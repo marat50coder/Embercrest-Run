@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'locker.dart';
-import 'pact.dart';
-import 'ping.dart';
+import '../hold/chest.dart';
+import '../pact/pact.dart';
+import '../net/pipe.dart';
 
-class NoticePermit extends StatefulWidget {
-  const NoticePermit({
+class PermitCard extends StatefulWidget {
+  const PermitCard({
     super.key,
     required this.locker,
     required this.ping,
@@ -14,16 +14,16 @@ class NoticePermit extends StatefulWidget {
     this.onTokenReady,
   });
 
-  final TrailLocker locker;
-  final PingRelay ping;
+  final AshChest locker;
+  final AlertPipe ping;
   final WidgetBuilder nextBuilder;
   final Future<void> Function(String token)? onTokenReady;
 
   @override
-  State<NoticePermit> createState() => _NoticePermitState();
+  State<PermitCard> createState() => _PermitCardState();
 }
 
-class _NoticePermitState extends State<NoticePermit> {
+class _PermitCardState extends State<PermitCard> {
   bool _working = false;
 
   @override
@@ -58,7 +58,7 @@ class _NoticePermitState extends State<NoticePermit> {
 
   Future<void> _snooze() {
     final until = DateTime.now().millisecondsSinceEpoch ~/ 1000 +
-        RidgePact.noticeSnoozeSeconds;
+        CinderPact.noticeSnoozeSeconds;
     return widget.locker.snoozeNotice(until);
   }
 
@@ -73,8 +73,8 @@ class _NoticePermitState extends State<NoticePermit> {
     final media = MediaQuery.of(context);
     final landscape = media.orientation == Orientation.landscape;
     final background = landscape
-        ? 'assets/magma_notice_wide.webp'
-        : 'assets/magma_notice_tall.webp';
+        ? 'assets/ashpass_landscape.webp'
+        : 'assets/ashpass_portrait.webp';
     final width = landscape
         ? (media.size.width * 0.315).clamp(240.0, 420.0)
         : (media.size.width * 0.80).clamp(280.0, 440.0);

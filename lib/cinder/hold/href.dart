@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Reads the killed-state notification destination written by SceneDelegate
-/// into UserDefaults (`flutter.rift_wake_link`).
-class WakeLink {
-  static const String dartKey = 'rift_wake_link';
+/// into UserDefaults (`flutter.cv_wake_href`).
+class ColdHref {
+  static const String dartKey = 'cv_wake_href';
 
   static Future<String?> consume() async {
     if (!Platform.isIOS) return null;

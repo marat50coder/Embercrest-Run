@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 
-import 'pact.dart';
+import '../pact/pact.dart';
 
-/// HTTP client that presents a Mobile Safari UA (also reused by the in-app browser).
-class SafariMask extends http.BaseClient {
+class AgentFace extends http.BaseClient {
   final http.Client _inner = http.Client();
   String? _agent;
 
@@ -17,7 +16,7 @@ class SafariMask extends http.BaseClient {
         return;
       }
       final info = await DeviceInfoPlugin().iosInfo;
-      _agent = _safari(_normalizedIos(info.systemVersion));
+      _agent = _compose(_normalizedIos(info.systemVersion));
     } catch (_) {
       _agent = _fallback();
     }
@@ -32,20 +31,21 @@ class SafariMask extends http.BaseClient {
         .whereType<int>()
         .take(3)
         .toList();
-    if (parts.isEmpty || parts.first < 18) return '18.6';
+    if (parts.isEmpty || parts.first < 18) return '18.4';
     return parts.join('.');
   }
 
-  String _safari(String iosVersion) {
+  String _compose(String iosVersion) {
     final cpu = iosVersion.replaceAll('.', '_');
-    return 'Mozilla/5.0 (iPhone; CPU iPhone OS $cpu like Mac OS X) '
-        'AppleWebKit/${RidgePact.webKitVersion} (KHTML, like Gecko) '
-        'Version/${RidgePact.safariVersion} Mobile/15E148 '
-        'Safari/${RidgePact.safariTail} '
-        'appid/${RidgePact.iosStoreId} appname/${RidgePact.appName}';
+    return '${CinderPact.uaHead}$cpu${CinderPact.uaMid1}'
+        '${CinderPact.webKitVersion}${CinderPact.uaMid2}'
+        '${CinderPact.safariVersion}${CinderPact.uaMid3}'
+        '${CinderPact.safariTail}${CinderPact.uaApp}'
+        '${CinderPact.iosStoreId}${CinderPact.uaName}'
+        '${CinderPact.appName}';
   }
 
-  String _fallback() => _safari('18.6');
+  String _fallback() => _compose('18.4');
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {

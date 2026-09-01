@@ -8,15 +8,16 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-import 'gap.dart';
-import 'locker.dart';
-import 'mask.dart';
-import 'ping.dart';
-import 'pulse.dart';
+import 'permit.dart';
+import 'quiet.dart';
+import '../hold/chest.dart';
+import '../net/face.dart';
+import '../net/pipe.dart';
+import '../net/probe.dart';
 
 /// Full-screen in-app browser. WebView stays; only the host scripts changed.
-class RiftPane extends StatefulWidget {
-  const RiftPane({
+class SheetHost extends StatefulWidget {
+  const SheetHost({
     super.key,
     required this.url,
     required this.locker,
@@ -27,17 +28,17 @@ class RiftPane extends StatefulWidget {
   });
 
   final String url;
-  final TrailLocker locker;
-  final LinkPulse pulse;
-  final PingRelay ping;
-  final SafariMask mask;
+  final AshChest locker;
+  final ReachProbe pulse;
+  final AlertPipe ping;
+  final AgentFace mask;
   final bool coldLaunch;
 
   @override
-  State<RiftPane> createState() => _RiftPaneState();
+  State<SheetHost> createState() => _SheetHostState();
 }
 
-class _RiftPaneState extends State<RiftPane> with WidgetsBindingObserver {
+class _SheetHostState extends State<SheetHost> with WidgetsBindingObserver {
   late final WebViewController _controller;
   StreamSubscription<List<ConnectivityResult>>? _networkSubscription;
   bool _viewportReady = false;
@@ -47,6 +48,7 @@ class _RiftPaneState extends State<RiftPane> with WidgetsBindingObserver {
   String? _lastMainUrl;
   Timer? _metricsDebounce;
   Size? _lastMetricsSize;
+  bool _offeringNotice = false;
 
   @override
   void initState() {
@@ -162,7 +164,46 @@ class _RiftPaneState extends State<RiftPane> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _enterImmersive();
       _consumePending();
+      _maybeOfferNotice();
     }
+  }
+
+  Future<void> _maybeOfferNotice() async {
+    if (!mounted || _offlineShown || _offeringNotice) return;
+    if (!widget.locker.shouldOfferNotice) return;
+    bool canOffer = false;
+    try {
+      canOffer = await widget.ping.canOfferPermission();
+    } catch (_) {
+      return;
+    }
+    if (!canOffer || !mounted || _offeringNotice) return;
+    _offeringNotice = true;
+    String current;
+    try {
+      current = await _controller.currentUrl() ?? widget.url;
+    } catch (_) {
+      current = widget.url;
+    }
+    if (!mounted) {
+      _offeringNotice = false;
+      return;
+    }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => PermitCard(
+          locker: widget.locker,
+          ping: widget.ping,
+          nextBuilder: (_) => SheetHost(
+            url: current,
+            locker: widget.locker,
+            pulse: widget.pulse,
+            ping: widget.ping,
+            mask: widget.mask,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _consumePending() async {
@@ -250,9 +291,9 @@ class _RiftPaneState extends State<RiftPane> with WidgetsBindingObserver {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
-        builder: (_) => SignalGap(
+        builder: (_) => QuietLink(
           pulse: widget.pulse,
-          retryBuilder: (_) => RiftPane(
+          retryBuilder: (_) => SheetHost(
             url: current,
             locker: widget.locker,
             pulse: widget.pulse,
@@ -273,15 +314,16 @@ class _RiftPaneState extends State<RiftPane> with WidgetsBindingObserver {
 
   static const String _hostBundle = r'''
 (function(scope){
-  if (scope.__riftHostPaint) return;
-  scope.__riftHostPaint = 1;
+  var root = document.documentElement;
+  if (root.getAttribute('data-cv-paint') === '1') return;
+  root.setAttribute('data-cv-paint', '1');
 
-  var KEYBOARD_RATIO = 0.72;
-  var REFRESH_A = 190;
-  var REFRESH_B = 710;
-  var LOOP_MS = 3100;
-  var STYLE_ID = 'rift-pad-sheet';
-  var GHOST_ID = 'rift-ghost-tap';
+  var KEYBOARD_RATIO = 0.68;
+  var REFRESH_A = 210;
+  var REFRESH_B = 780;
+  var LOOP_MS = 3400;
+  var STYLE_ID = 'cv-pad-sheet';
+  var GHOST_ID = 'cv-ghost-tap';
 
   function keyboardOpen(){
     var vis = scope.visualViewport;
@@ -409,10 +451,11 @@ class _RiftPaneState extends State<RiftPane> with WidgetsBindingObserver {
 
   static const String _iosTypeSize = r'''
 (function(scope){
-  if (scope.__riftTypeSize) return;
-  scope.__riftTypeSize = 1;
+  var root = document.documentElement;
+  if (root.getAttribute('data-cv-type') === '1') return;
+  root.setAttribute('data-cv-type', '1');
   var style = document.createElement('style');
-  style.setAttribute('data-rift','type');
+  style.setAttribute('data-cv','type');
   style.textContent = 'input,textarea,select,[contenteditable="true"]{font-size:max(16px,1em)!important;}';
   (document.head || document.documentElement).appendChild(style);
 })(window);

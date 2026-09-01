@@ -4,11 +4,11 @@ PODS:
   - appsflyer_sdk (6.17.3):
     - appsflyer_sdk/Core (= 6.17.3)
   - appsflyer_sdk/Core (6.17.3):
-    - AppsFlyerFramework (= 6.17.5)
+    - AppsFlyerFramework (= 6.17.3)
     - Flutter
-  - AppsFlyerFramework (6.17.5):
-    - AppsFlyerFramework/Main (= 6.17.5)
-  - AppsFlyerFramework/Main (6.17.5)
+  - AppsFlyerFramework (6.17.3):
+    - AppsFlyerFramework/Main (= 6.17.3)
+  - AppsFlyerFramework/Main (6.17.3)
   - audioplayers_darwin (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -21,10 +21,10 @@ PODS:
   - Firebase/Messaging (12.15.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 12.15.0)
-  - firebase_core (4.12.1):
+  - firebase_core (4.11.0):
     - Firebase/CoreOnly (= 12.15.0)
     - Flutter
-  - firebase_messaging (16.4.3):
+  - firebase_messaging (16.4.1):
     - Firebase/Messaging (= 12.15.0)
     - firebase_core
     - Flutter
@@ -49,9 +49,8 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.1)
     - nanopb (~> 3.30910.0)
   - Flutter (1.0.0)
-  - flutter_secure_storage_darwin (10.0.0):
+  - flutter_secure_storage (6.0.0):
     - Flutter
-    - FlutterMacOS
   - GoogleDataTransport (10.1.1):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
@@ -100,11 +99,10 @@ DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/darwin`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
-  - Firebase/Messaging (= 12.15.0)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
-  - flutter_secure_storage_darwin (from `.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
+  - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
@@ -139,8 +137,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
-  flutter_secure_storage_darwin:
-    :path: ".symlinks/plugins/flutter_secure_storage_darwin/darwin"
+  flutter_secure_storage:
+    :path: ".symlinks/plugins/flutter_secure_storage/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   url_launcher_ios:
@@ -149,21 +147,21 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
-  app_tracking_transparency: 3d84f147f67ca82d3c15355c36b1fa6b66ca7c92
-  appsflyer_sdk: 23e08a1f2a2a0c3f5d58c91a5820dba768d738c8
-  AppsFlyerFramework: da52a40c07c9f81a7829952e0fd854b6eacf5a7d
+  app_tracking_transparency: 697a5a2215d1abd69b5d6420ddef4c91956bade7
+  appsflyer_sdk: 8e2f99fd9cacf5fa4258c2e9c51d0d34d6753425
+  AppsFlyerFramework: 96bfcef9e433f3b887d1b0e49bc6c1c37325f646
   audioplayers_darwin: 835ced6edd4c9fc8ebb0a7cc9e294a91d99917d5
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Firebase: a8539b633d474fbeb654c7043f9c1649e274045b
-  firebase_core: 1c1e250a77e2df9e80bb8bf0875c8b427044a697
-  firebase_messaging: 90cf2b62f5058120ab19f29ceff1503ba0f51ba7
+  firebase_core: fc23178af8ea070194d09031ae4198a9608a3d22
+  firebase_messaging: 870b2939a7f7cc52bc38ca0250127c45b42f4bad
   FirebaseCore: 2e86a4ea1684d4381707069e4a6d89ac808e901e
   FirebaseCoreInternal: 6ab6a02c94446c026d2cf35cf5383842ebaa4992
   FirebaseInstallations: eb29ccbf64eaedf86fd5b2ccc7fabde567660b52
   FirebaseMessaging: 40017d7bc8457ee295b0f41d480a80fdabc9994e
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_secure_storage_darwin: acdb3f316ed05a3e68f856e0353b133eec373a23
+  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   GoogleDataTransport: a24e58982ab3ba2f64d79613e027fe7f57e88539
   GoogleUtilities: 4e0c2ad9fa0d0d18b5c4df8bf57b461cba35b0bb
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
@@ -172,6 +170,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
 
-PODFILE CHECKSUM: c9aed2bcf136fcdfc4c235972436602d281593bb
+PODFILE CHECKSUM: de59ac0fbb61eaa16a1ba5f7cc8c10d0390c9126
 
 COCOAPODS: 1.17.0

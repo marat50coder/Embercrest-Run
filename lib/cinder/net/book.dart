@@ -7,14 +7,14 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import 'mask.dart';
-import 'note.dart';
-import 'pact.dart';
+import '../net/face.dart';
+import '../pact/trace.dart';
+import '../pact/pact.dart';
 
-class FlightLedger {
-  FlightLedger(this._mask);
+class SignalBook {
+  SignalBook(this._mask);
 
-  final SafariMask _mask;
+  final AgentFace _mask;
   AppsflyerSdk? _sdk;
   Map<String, dynamic>? _install;
   Map<String, dynamic>? _reopen;
@@ -26,7 +26,7 @@ class FlightLedger {
   Future<void> start() => _startFuture ??= _start();
 
   Future<void> _start() async {
-    if (!RidgePact.pactReady) {
+    if (!CinderPact.pactReady) {
       _completeEmpty();
       return;
     }
@@ -34,8 +34,8 @@ class FlightLedger {
       await _requestTrackingIfNeeded();
       final sdk = AppsflyerSdk(
         AppsFlyerOptions(
-          afDevKey: RidgePact.appsFlyerKey,
-          appId: RidgePact.iosStoreId,
+          afDevKey: CinderPact.appsFlyerKey,
+          appId: CinderPact.iosStoreId,
           showDebug: kDebugMode,
           timeToWaitForATTUserAuthorization: 5,
         ),
@@ -54,7 +54,7 @@ class FlightLedger {
         registerOnDeepLinkingCallback: true,
       );
     } catch (error) {
-      riftNote(() => '[RIFT.LEDGER] init failed: $error');
+      cinderLog(() => '[CV.LEDGER] init failed: $error');
       _completeEmpty();
     }
   }
@@ -64,7 +64,7 @@ class FlightLedger {
     final status = await AppTrackingTransparency.trackingAuthorizationStatus;
     if (status != TrackingStatus.notDetermined) return;
     await WidgetsBinding.instance.endOfFrame;
-    await Future<void>.delayed(const Duration(milliseconds: 410));
+    await Future<void>.delayed(const Duration(milliseconds: 487));
     await AppTrackingTransparency.requestTrackingAuthorization();
   }
 
@@ -74,22 +74,22 @@ class FlightLedger {
       final status = received['status']?.toString().toLowerCase();
       final failed = status == 'failure' ||
           (received['af_status'] == null && received.containsKey('status'));
-      riftNote(
-        () => '[RIFT.LEDGER] conversion status=$status '
+      cinderLog(
+        () => '[CV.LEDGER] conversion status=$status '
             'af_status=${received['af_status']} keys=${received.keys.toList()}',
       );
       if (failed) {
         _install = <String, dynamic>{};
       } else if (received['af_status'] == 'Organic') {
         await Future<void>.delayed(
-          const Duration(seconds: RidgePact.organicReplaySeconds),
+          const Duration(seconds: CinderPact.organicReplaySeconds),
         );
         _install = await _fetchGcd() ?? received;
       } else {
         _install = received;
       }
     } catch (error) {
-      riftNote(() => '[RIFT.LEDGER] conversion parse error: $error');
+      cinderLog(() => '[CV.LEDGER] conversion parse error: $error');
       _install = <String, dynamic>{};
     } finally {
       if (!_installReady.isCompleted) _installReady.complete();
@@ -107,19 +107,19 @@ class FlightLedger {
     final uid = await appsFlyerId();
     if (uid == null || uid.isEmpty) return null;
     try {
-      final base = RidgePact.gcdBase;
+      final base = CinderPact.gcdBase;
       final sep = base.contains('?') ? '&' : '?';
       final uri = Uri.parse(
-        '$base${sep}app_id=${RidgePact.iosStoreId}&device_id=$uid',
+        '$base${sep}app_id=${CinderPact.iosStoreId}&device_id=$uid',
       );
       final response = await _mask
           .get(
             uri,
             headers: <String, String>{
-              'Authorization': 'Bearer ${RidgePact.appsFlyerKey}',
+              'Authorization': 'Bearer ${CinderPact.appsFlyerKey}',
             },
           )
-          .timeout(const Duration(seconds: 14));
+          .timeout(const Duration(seconds: 13));
       if (response.statusCode != 200) return null;
       final decoded = jsonDecode(response.body);
       return decoded is Map ? Map<String, dynamic>.from(decoded) : null;
@@ -163,15 +163,15 @@ class FlightLedger {
     }
 
     body['af_id'] = await appsFlyerId() ?? body['af_id'] ?? '';
-    body['bundle_id'] = RidgePact.bundleId;
+    body['bundle_id'] = CinderPact.bundleId;
     body['os'] = 'iOS';
-    body['store_id'] = RidgePact.storeToken;
+    body['store_id'] = CinderPact.storeToken;
     body['locale'] = locale;
     if (pushToken != null &&
         pushToken.isNotEmpty &&
-        RidgePact.firebaseProjectNumber.isNotEmpty) {
+        CinderPact.firebaseProjectNumber.isNotEmpty) {
       body['push_token'] = pushToken;
-      body['firebase_project_id'] = RidgePact.firebaseProjectNumber;
+      body['firebase_project_id'] = CinderPact.firebaseProjectNumber;
     }
 
     if (Platform.isIOS) {
@@ -185,7 +185,7 @@ class FlightLedger {
         }
       } catch (_) {}
     }
-    riftNote(() => '[RIFT.LEDGER] payload ${jsonEncode(body)}');
+    cinderLog(() => '[CV.LEDGER] payload ${jsonEncode(body)}');
     return body;
   }
 

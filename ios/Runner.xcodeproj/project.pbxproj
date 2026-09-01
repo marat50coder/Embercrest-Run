@@ -20,7 +20,6 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		9C8A8CCE0AA4902B297F5BB1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3001BD293C97C421CDEE87D8 /* Pods_Runner.framework */; };
 		AC0540C538B0FC860DEA9C54 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38131FA7506EAAB703B762B1 /* NotificationService.swift */; };
-		F81AF09339E39BCF2357F328 /* Pods_EmberMediaService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F8A7AA1765EFA12F4AF1517 /* Pods_EmberMediaService.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,15 +66,12 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
-		1B04D8707766FEDA94EAD323 /* Pods-EmberMediaService.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmberMediaService.profile.xcconfig"; path = "Target Support Files/Pods-EmberMediaService/Pods-EmberMediaService.profile.xcconfig"; sourceTree = "<group>"; };
-		2F8A7AA1765EFA12F4AF1517 /* Pods_EmberMediaService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmberMediaService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3001BD293C97C421CDEE87D8 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33B78BAD07DC7C10CDA36FD6 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		38131FA7506EAAB703B762B1 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
-		41103F6AD22EBA7C709149EE /* Pods-EmberMediaService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmberMediaService.debug.xcconfig"; path = "Target Support Files/Pods-EmberMediaService/Pods-EmberMediaService.debug.xcconfig"; sourceTree = "<group>"; };
 		41678B4B3E0CB9339125B22F /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		4DB3387F2D7374E5132B2C43 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		5059DE94EB230921584A0450 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -94,7 +90,6 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9A64C1FAF9586C8565141090 /* Pods-EmberMediaService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmberMediaService.release.xcconfig"; path = "Target Support Files/Pods-EmberMediaService/Pods-EmberMediaService.release.xcconfig"; sourceTree = "<group>"; };
 		D61CF7941C1D484FA37C13D4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DA600B503C453E906C40425E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB484B4A27B6B473D702A59D /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -105,7 +100,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F81AF09339E39BCF2357F328 /* Pods_EmberMediaService.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,7 +144,6 @@
 			children = (
 				3001BD293C97C421CDEE87D8 /* Pods_Runner.framework */,
 				33B78BAD07DC7C10CDA36FD6 /* Pods_RunnerTests.framework */,
-				2F8A7AA1765EFA12F4AF1517 /* Pods_EmberMediaService.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -216,9 +209,6 @@
 				FB484B4A27B6B473D702A59D /* Pods-RunnerTests.debug.xcconfig */,
 				5059DE94EB230921584A0450 /* Pods-RunnerTests.release.xcconfig */,
 				9787537343A5A80325DA737E /* Pods-RunnerTests.profile.xcconfig */,
-				41103F6AD22EBA7C709149EE /* Pods-EmberMediaService.debug.xcconfig */,
-				9A64C1FAF9586C8565141090 /* Pods-EmberMediaService.release.xcconfig */,
-				1B04D8707766FEDA94EAD323 /* Pods-EmberMediaService.profile.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -230,7 +220,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 93B1FCC80294E14EFCAA7E96 /* Build configuration list for PBXNativeTarget "EmberMediaService" */;
 			buildPhases = (
-				83B48474CCACD7C9D4766D47 /* [CP] Check Pods Manifest.lock */,
 				ACD9410887D9FB5F5B10BEEA /* Sources */,
 				29EDC25F5372B19B0512025E /* Frameworks */,
 				DAFBD8865A602AADD24C6788 /* Resources */,
@@ -412,28 +401,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		83B48474CCACD7C9D4766D47 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-EmberMediaService-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {
@@ -679,7 +646,6 @@
 		};
 		4522166ED2DD1D9228FC2C21 /* Profile */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1B04D8707766FEDA94EAD323 /* Pods-EmberMediaService.profile.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -705,7 +671,6 @@
 		};
 		5C4567D1AA38F8195E00CCD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 41103F6AD22EBA7C709149EE /* Pods-EmberMediaService.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -732,7 +697,6 @@
 		};
 		66831F0789301E5C511B79A2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9A64C1FAF9586C8565141090 /* Pods-EmberMediaService.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;

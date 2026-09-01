@@ -144,7 +144,7 @@ class Biome {
   static const all = <Biome>[
     Biome(
       name: 'Ashen Plains',
-      background: 'assets/bg_location_1_asset.webp',
+      background: 'assets/rim_1.webp',
       tint: Color(0xFFFFB27A),
       decayScale: 1.25,
       obstacleDensity: 0.55,
@@ -156,7 +156,7 @@ class Biome {
     ),
     Biome(
       name: 'Lava Whirlpools',
-      background: 'assets/bg_location_2_asset.webp',
+      background: 'assets/rim_2.webp',
       tint: Color(0xFFFF9A5A),
       decayScale: 1.05,
       obstacleDensity: 0.95,
@@ -168,7 +168,7 @@ class Biome {
     ),
     Biome(
       name: 'Obsidian Canyons',
-      background: 'assets/bg_location_3_asset.webp',
+      background: 'assets/rim_3.webp',
       tint: Color(0xFFB89BFF),
       decayScale: 0.95,
       obstacleDensity: 1.15,
@@ -180,7 +180,7 @@ class Biome {
     ),
     Biome(
       name: 'Magma Lakes',
-      background: 'assets/bg_location_4_asset.webp',
+      background: 'assets/rim_4.webp',
       tint: Color(0xFFFF8347),
       decayScale: 0.88,
       obstacleDensity: 1.25,
@@ -192,7 +192,7 @@ class Biome {
     ),
     Biome(
       name: 'Fire Forests',
-      background: 'assets/bg_location_5_asset.webp',
+      background: 'assets/rim_5.webp',
       tint: Color(0xFFFFA24A),
       decayScale: 0.82,
       obstacleDensity: 1.3,
@@ -204,7 +204,7 @@ class Biome {
     ),
     Biome(
       name: 'Heart of the Volcano',
-      background: 'assets/bg_location_6_asset.webp',
+      background: 'assets/rim_6.webp',
       tint: Color(0xFFFF6A3C),
       decayScale: 0.72,
       obstacleDensity: 1.55,

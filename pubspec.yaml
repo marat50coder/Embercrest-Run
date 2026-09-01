@@ -1,7 +1,7 @@
 name: embercrest_run
 description: "Embercrest Run - grow a living magma road across a supervolcano."
 publish_to: 'none'
-version: 1.0.1+5
+version: 1.0.1+6
 
 environment:
   sdk: ^3.11.5
@@ -10,20 +10,20 @@ dependencies:
   flutter:
     sdk: flutter
 
-  audioplayers: ^6.5.1
-  shared_preferences: ^2.5.3
-  url_launcher: ^6.3.1
+  audioplayers: ^6.5.0
+  shared_preferences: ^2.5.2
+  url_launcher: ^6.3.0
 
-  webview_flutter: 4.13.0
-  webview_flutter_wkwebview: 3.23.0
-  appsflyer_sdk: 6.17.5
-  app_tracking_transparency: 2.0.6
-  firebase_core: 4.12.1
-  firebase_messaging: 16.4.3
-  http: 1.4.0
-  connectivity_plus: 7.0.0
-  device_info_plus: 12.2.0
-  flutter_secure_storage: 10.2.0
+  webview_flutter: 4.12.0
+  webview_flutter_wkwebview: 3.22.0
+  appsflyer_sdk: 6.17.3
+  app_tracking_transparency: 2.0.4
+  firebase_core: 4.11.0
+  firebase_messaging: 16.4.1
+  http: 1.3.0
+  connectivity_plus: 6.1.5
+  device_info_plus: 11.5.0
+  flutter_secure_storage: 9.2.4
 
 dev_dependencies:
   flutter_test:
@@ -39,24 +39,24 @@ flutter:
     # packed sprite atlas + lookup table (everything drawn during a run)
     - assets/atlas/
     # full-size art that is never batched
-    - assets/Game_Name.webp
-    - assets/Icon.png
-    - assets/magma_boot_wide.webp
-    - assets/magma_boot_tall.webp
-    - assets/magma_notice_wide.webp
-    - assets/magma_notice_tall.webp
-    - assets/bg_location_1_asset.webp
-    - assets/bg_location_2_asset.webp
-    - assets/bg_location_3_asset.webp
-    - assets/bg_location_4_asset.webp
-    - assets/bg_location_5_asset.webp
-    - assets/bg_location_6_asset.webp
+    - assets/crest_wordmark.webp
+    - assets/crest_mark.png
+    - assets/caldera_wide.webp
+    - assets/caldera_tall.webp
+    - assets/ashpass_landscape.webp
+    - assets/ashpass_portrait.webp
+    - assets/rim_1.webp
+    - assets/rim_2.webp
+    - assets/rim_3.webp
+    - assets/rim_4.webp
+    - assets/rim_5.webp
+    - assets/rim_6.webp
     - sounds/
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/Icon.png"
+  image_path: "assets/crest_mark.png"
   remove_alpha_ios: true
   adaptive_icon_background: "#120608"
-  adaptive_icon_foreground: "assets/Icon.png"
+  adaptive_icon_foreground: "assets/crest_mark.png"

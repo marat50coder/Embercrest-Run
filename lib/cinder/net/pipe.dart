@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'locker.dart';
-import 'note.dart';
+import '../hold/chest.dart';
+import '../pact/trace.dart';
 
 @pragma('vm:entry-point')
-Future<void> riftBackgroundPing(RemoteMessage _) async {}
+Future<void> cinderBgPing(RemoteMessage _) async {}
 
-class PingRelay {
-  PingRelay(this._locker, {required this.enabled});
+class AlertPipe {
+  AlertPipe(this._locker, {required this.enabled});
 
-  final TrailLocker _locker;
+  final AshChest _locker;
   final bool enabled;
   FirebaseMessaging? _messaging;
   Future<void>? _bootFuture;
@@ -37,10 +37,9 @@ class PingRelay {
       final initialUrl = initial == null ? null : _extract(initial.data);
       if (initialUrl != null) await _locker.stashPushUrl(initialUrl);
     } catch (error) {
-      riftNote(() => '[RIFT.PING] initial message failed: $error');
+      cinderLog(() => '[CV.PING] initial message failed: $error');
     }
 
-    FirebaseMessaging.onBackgroundMessage(riftBackgroundPing);
     await messaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
@@ -50,17 +49,20 @@ class PingRelay {
       _token = value;
       onTokenChanged?.call(value);
     });
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      final url = _extract(message.data);
-      if (url == null) return;
-      final callback = onDestination;
-      if (callback == null) {
-        _locker.stashPushUrl(url);
-      } else {
-        callback(url);
-      }
-    });
+    FirebaseMessaging.onMessage.listen(_acceptPush);
+    FirebaseMessaging.onMessageOpenedApp.listen(_acceptPush);
     await _refreshToken();
+  }
+
+  void _acceptPush(RemoteMessage message) {
+    final url = _extract(message.data);
+    if (url == null) return;
+    final callback = onDestination;
+    if (callback == null) {
+      _locker.stashPushUrl(url);
+    } else {
+      callback(url);
+    }
   }
 
   Future<void> _refreshToken({int attempts = 6}) async {
@@ -73,7 +75,7 @@ class PingRelay {
         onTokenChanged?.call(_token!);
       }
     } catch (error) {
-      riftNote(() => '[RIFT.PING] getToken failed: $error');
+      cinderLog(() => '[CV.PING] getToken failed: $error');
     }
   }
 
@@ -110,21 +112,19 @@ class PingRelay {
   }
 
   Future<bool> canOfferPermission() async {
-    if (!enabled || _locker.pingBlockedByOs) return false;
+    if (!enabled) return false;
     try {
       await boot();
     } catch (error) {
-      riftNote(() => '[RIFT.PING] boot before offer failed: $error');
+      cinderLog(() => '[CV.PING] boot before offer failed: $error');
       return false;
     }
     final messaging = _messaging;
     if (messaging == null) return false;
     final status =
         (await messaging.getNotificationSettings()).authorizationStatus;
-    if (status == AuthorizationStatus.denied) {
-      await _locker.markPingBlockedByOs();
-      return false;
-    }
+    if (status == AuthorizationStatus.authorized) return false;
+    if (status == AuthorizationStatus.denied) return false;
     return status == AuthorizationStatus.notDetermined ||
         status == AuthorizationStatus.provisional;
   }
@@ -140,7 +140,7 @@ class PingRelay {
     try {
       await boot();
     } catch (error) {
-      riftNote(() => '[RIFT.PING] boot before ask failed: $error');
+      cinderLog(() => '[CV.PING] boot before ask failed: $error');
       return false;
     }
     if (_messaging == null) return false;

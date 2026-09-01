@@ -3,26 +3,26 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../core/palette.dart';
-import '../screens/loading_screen.dart';
-import '../ui/loading_mark.dart';
-import 'arbiter.dart';
-import 'gap.dart';
-import 'notice.dart';
-import 'pane.dart';
-import 'verdicts.dart';
+import '../../../core/palette.dart';
+import '../../../screens/loading_screen.dart';
+import '../../../ui/loading_mark.dart';
+import '../trail/judge.dart';
+import '../trail/call.dart';
+import 'quiet.dart';
+import 'permit.dart';
+import 'sheet.dart';
 
-class RidgeAwake extends StatefulWidget {
-  const RidgeAwake({super.key, this.arbiter});
+class CinderDawn extends StatefulWidget {
+  const CinderDawn({super.key, this.arbiter});
 
-  final TrailArbiter? arbiter;
+  final PathJudge? arbiter;
 
   @override
-  State<RidgeAwake> createState() => _RidgeAwakeState();
+  State<CinderDawn> createState() => _CinderDawnState();
 }
 
-class _RidgeAwakeState extends State<RidgeAwake> {
-  TrailVerdict? _verdict;
+class _CinderDawnState extends State<CinderDawn> {
+  PathCall? _verdict;
   bool _ready = false;
   bool _started = false;
   bool _navigating = false;
@@ -42,8 +42,8 @@ class _RidgeAwakeState extends State<RidgeAwake> {
   void _onDeadline() {
     if (!mounted || _navigating || _verdict != null) return;
     _verdict = widget.arbiter == null
-        ? const PlayVerdict()
-        : const GloomVerdict(returnToPlay: false);
+        ? const PlayCall()
+        : const QuietCall(returnToPlay: false);
     setState(() => _ready = true);
   }
 
@@ -65,14 +65,14 @@ class _RidgeAwakeState extends State<RidgeAwake> {
   Future<void> _resolve() async {
     final arbiter = widget.arbiter;
     if (arbiter == null) {
-      _verdict = const PlayVerdict();
+      _verdict = const PlayCall();
       if (mounted) setState(() => _ready = true);
       return;
     }
     try {
       _verdict = await arbiter.decide(onProgress: (_) {});
     } catch (_) {
-      _verdict = const PlayVerdict();
+      _verdict = const PlayCall();
     }
     _hardDeadline?.cancel();
     if (mounted) setState(() => _ready = true);
@@ -85,31 +85,31 @@ class _RidgeAwakeState extends State<RidgeAwake> {
     await _open(_verdict!);
   }
 
-  Future<void> _open(TrailVerdict verdict) async {
+  Future<void> _open(PathCall verdict) async {
     final arbiter = widget.arbiter;
     final navigator = Navigator.of(context);
 
-    if (verdict is PlayVerdict || arbiter == null) {
+    if (verdict is PlayCall || arbiter == null) {
       navigator.pushReplacement(
         MaterialPageRoute<void>(builder: (_) => const LoadingScreen()),
       );
       return;
     }
 
-    if (verdict is GloomVerdict) {
+    if (verdict is QuietCall) {
       navigator.pushReplacement(
         MaterialPageRoute<void>(
-          builder: (_) => SignalGap(
+          builder: (_) => QuietLink(
             pulse: arbiter.pulse,
-            retryBuilder: (_) => RidgeAwake(arbiter: arbiter),
+            retryBuilder: (_) => CinderDawn(arbiter: arbiter),
           ),
         ),
       );
       return;
     }
 
-    if (verdict is ViewVerdict) {
-      Widget paneBuilder(BuildContext _) => RiftPane(
+    if (verdict is ViewCall) {
+      Widget paneBuilder(BuildContext _) => SheetHost(
             url: verdict.url,
             coldLaunch: verdict.coldLaunch,
             locker: arbiter.locker,
@@ -130,7 +130,7 @@ class _RidgeAwakeState extends State<RidgeAwake> {
       if (showNotice) {
         navigator.pushReplacement(
           MaterialPageRoute<void>(
-            builder: (_) => NoticePermit(
+            builder: (_) => PermitCard(
               locker: arbiter.locker,
               ping: arbiter.ping,
               nextBuilder: paneBuilder,
@@ -149,8 +149,8 @@ class _RidgeAwakeState extends State<RidgeAwake> {
     final portrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final art = portrait
-        ? 'assets/magma_boot_tall.webp'
-        : 'assets/magma_boot_wide.webp';
+        ? 'assets/caldera_tall.webp'
+        : 'assets/caldera_wide.webp';
     final screenW = MediaQuery.of(context).size.width;
 
     return Scaffold(

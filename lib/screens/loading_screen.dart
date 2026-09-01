@@ -31,7 +31,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> _precacheArt() async {
-    await precacheImage(const AssetImage('assets/Game_Name.webp'), context);
+    await precacheImage(const AssetImage('assets/crest_wordmark.webp'), context);
     if (!mounted) return;
     await precacheImage(AssetImage(Biome.all.last.background), context);
   }
@@ -86,8 +86,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     final portrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final art = portrait
-        ? 'assets/magma_boot_tall.webp'
-        : 'assets/magma_boot_wide.webp';
+        ? 'assets/caldera_tall.webp'
+        : 'assets/caldera_wide.webp';
     final screenW = MediaQuery.of(context).size.width;
 
     return Scaffold(

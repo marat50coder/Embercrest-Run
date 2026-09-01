@@ -3,17 +3,17 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'cinder/face/dawn.dart';
+import 'cinder/hold/chest.dart';
+import 'cinder/net/book.dart';
+import 'cinder/net/face.dart';
+import 'cinder/net/pipe.dart';
+import 'cinder/net/post.dart';
+import 'cinder/net/probe.dart';
+import 'cinder/pact/pact.dart';
+import 'cinder/pact/trace.dart';
+import 'cinder/trail/judge.dart';
 import 'core/palette.dart';
-import 'ridgeline/arbiter.dart';
-import 'ridgeline/awake.dart';
-import 'ridgeline/ledger.dart';
-import 'ridgeline/locker.dart';
-import 'ridgeline/mask.dart';
-import 'ridgeline/note.dart';
-import 'ridgeline/pact.dart';
-import 'ridgeline/ping.dart';
-import 'ridgeline/pulse.dart';
-import 'ridgeline/wire.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,45 +21,45 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  final locker = TrailLocker();
-  final mask = SafariMask();
+  final locker = AshChest();
+  final mask = AgentFace();
   await Future.wait<void>(<Future<void>>[
     locker.open(),
     mask.warm(),
   ]);
 
-  riftNote(
-    () => '[RIFT.BOOT] pactReady=${RidgePact.pactReady} '
-        'endpoint=${RidgePact.endpoint} '
-        'afKeyLen=${RidgePact.appsFlyerKey.length} '
-        'fbNum=${RidgePact.firebaseProjectNumber}',
+  cinderLog(
+    () => '[CV.BOOT] pactReady=${CinderPact.pactReady} '
+        'endpoint=${CinderPact.endpoint} '
+        'afKeyLen=${CinderPact.appsFlyerKey.length} '
+        'fbNum=${CinderPact.firebaseProjectNumber}',
   );
 
   var productionServicesReady = false;
-  if (RidgePact.pactReady) {
+  if (CinderPact.pactReady) {
     try {
       await Firebase.initializeApp();
-      FirebaseMessaging.onBackgroundMessage(riftBackgroundPing);
+      FirebaseMessaging.onBackgroundMessage(cinderBgPing);
       productionServicesReady = true;
-      riftNote(() => '[RIFT.BOOT] Firebase.initializeApp OK');
+      cinderLog(() => '[CV.BOOT] Firebase.initializeApp OK');
     } catch (error) {
-      riftNote(() => '[RIFT.BOOT] Firebase.initializeApp failed: $error');
+      cinderLog(() => '[CV.BOOT] Firebase.initializeApp failed: $error');
     }
   } else {
-    riftNote(() => '[RIFT.BOOT] pact closed — native play only.');
+    cinderLog(() => '[CV.BOOT] pact closed — native play only.');
   }
 
-  final pulse = LinkPulse();
-  final ping = PingRelay(locker, enabled: productionServicesReady);
-  final ledger = FlightLedger(mask);
-  final arbiter = TrailArbiter(
+  final pulse = ReachProbe();
+  final ping = AlertPipe(locker, enabled: productionServicesReady);
+  final ledger = SignalBook(mask);
+  final arbiter = PathJudge(
     locker: locker,
     pulse: pulse,
     ledger: ledger,
-    wire: PactWire(mask, locker),
+    wire: PactPost(mask, locker),
     ping: ping,
     mask: mask,
-    runtimeEnabled: RidgePact.pactReady,
+    runtimeEnabled: CinderPact.pactReady,
   );
 
   runApp(EmbercrestApp(arbiter: arbiter));
@@ -68,7 +68,7 @@ Future<void> main() async {
 class EmbercrestApp extends StatelessWidget {
   const EmbercrestApp({super.key, this.arbiter});
 
-  final TrailArbiter? arbiter;
+  final PathJudge? arbiter;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,7 @@ class EmbercrestApp extends StatelessWidget {
           },
         ),
       ),
-      home: RidgeAwake(arbiter: arbiter),
+      home: CinderDawn(arbiter: arbiter),
     );
   }
 }

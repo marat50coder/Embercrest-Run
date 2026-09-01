@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-/// Interface check plus a short DNS probe against public Apple hosts.
-class LinkPulse {
+class ReachProbe {
   final Connectivity _connectivity = Connectivity();
 
   Future<bool> hasInterface() async {
@@ -17,7 +16,7 @@ class LinkPulse {
 
   Future<bool> canReachNetwork() async {
     if (!await hasInterface()) return false;
-    for (final host in const <String>['captive.apple.com', 'www.apple.com']) {
+    for (final host in const <String>['dns9.quad9.net', 'resolver1.opendns.com']) {
       try {
         final records = await InternetAddress.lookup(
           host,

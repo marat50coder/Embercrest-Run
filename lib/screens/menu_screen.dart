@@ -194,7 +194,7 @@ class _MenuScreenState extends State<MenuScreen>
                 child: child,
               ),
               child: Image.asset(
-                'assets/Game_Name.webp',
+                'assets/crest_wordmark.webp',
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.medium,
               ),

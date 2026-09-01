@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'pulse.dart';
+import '../net/probe.dart';
 
-class SignalGap extends StatefulWidget {
-  const SignalGap({
+class QuietLink extends StatefulWidget {
+  const QuietLink({
     super.key,
     required this.pulse,
     required this.retryBuilder,
   });
 
-  final LinkPulse pulse;
+  final ReachProbe pulse;
   final WidgetBuilder retryBuilder;
 
   @override
-  State<SignalGap> createState() => _SignalGapState();
+  State<QuietLink> createState() => _QuietLinkState();
 }
 
-class _SignalGapState extends State<SignalGap> {
+class _QuietLinkState extends State<QuietLink> {
   bool _checking = false;
   bool _stillOffline = false;
 

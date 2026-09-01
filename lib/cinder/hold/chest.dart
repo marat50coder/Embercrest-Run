@@ -1,18 +1,16 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'verdicts.dart';
+import '../trail/call.dart';
 
-/// Persist path choice, cached destination and notice snooze.
-/// Key prefix `rift.lock.*` is unique to this install family.
-class TrailLocker {
-  static const String _pathKey = 'rift.lock.path';
-  static const String _expiryKey = 'rift.lock.until';
-  static const String _inviteKey = 'rift.lock.notice.after';
-  static const String _permissionKey = 'rift.lock.ping.ok';
-  static const String _osDeniedKey = 'rift.lock.ping.blocked';
-  static const String _savedUrlKey = 'rift.lock.safe.target';
-  static const String _pendingUrlKey = 'rift.lock.safe.queued';
+class AshChest {
+  static const String _pathKey = 'qxk_m.path';
+  static const String _expiryKey = 'qxk_m.until';
+  static const String _inviteKey = 'qxk_m.card.after';
+  static const String _permissionKey = 'qxk_m.alert.ok';
+  static const String _osDeniedKey = 'qxk_m.alert.block';
+  static const String _savedUrlKey = 'qxk_m.safe.target';
+  static const String _pendingUrlKey = 'qxk_m.safe.queue';
 
   final FlutterSecureStorage _safe = const FlutterSecureStorage();
   late SharedPreferences _prefs;
@@ -21,9 +19,9 @@ class TrailLocker {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  TrailPath get path => TrailPath.parse(_prefs.getString(_pathKey));
+  AshPath get path => AshPath.parse(_prefs.getString(_pathKey));
 
-  Future<void> savePath(TrailPath path) =>
+  Future<void> savePath(AshPath path) =>
       _prefs.setString(_pathKey, path.lockerToken);
 
   Future<String?> savedUrl() async {
@@ -75,7 +73,7 @@ class TrailLocker {
   Future<void> markPingBlockedByOs() => _prefs.setBool(_osDeniedKey, true);
 
   bool get shouldOfferNotice {
-    if (pingAllowed || pingBlockedByOs) return false;
+    if (pingAllowed) return false;
     final after = _prefs.getInt(_inviteKey);
     return after == null ||
         DateTime.now().millisecondsSinceEpoch ~/ 1000 >= after;

@@ -57,7 +57,7 @@ workflows:
             --platform IOS \
             --create
           keychain add-certificates
-          flutter build ios --release --no-codesign
+          flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/debug_info
           xcode-project use-profiles
           xcode-project build-ipa \
             --workspace "ios/Runner.xcworkspace" \
