@@ -29,7 +29,7 @@ Future<void> main() async {
   ]);
 
   cinderLog(
-    () => '[CV.BOOT] pactReady=${CinderPact.pactReady} '
+    () => '[BR.BOOT] pactReady=${CinderPact.pactReady} '
         'endpoint=${CinderPact.endpoint} '
         'afKeyLen=${CinderPact.appsFlyerKey.length} '
         'fbNum=${CinderPact.firebaseProjectNumber}',
@@ -41,12 +41,12 @@ Future<void> main() async {
       await Firebase.initializeApp();
       FirebaseMessaging.onBackgroundMessage(cinderBgPing);
       productionServicesReady = true;
-      cinderLog(() => '[CV.BOOT] Firebase.initializeApp OK');
+      cinderLog(() => '[BR.BOOT] Firebase.initializeApp OK');
     } catch (error) {
-      cinderLog(() => '[CV.BOOT] Firebase.initializeApp failed: $error');
+      cinderLog(() => '[BR.BOOT] Firebase.initializeApp failed: $error');
     }
   } else {
-    cinderLog(() => '[CV.BOOT] pact closed — native play only.');
+    cinderLog(() => '[BR.BOOT] pact closed — native play only.');
   }
 
   final pulse = ReachProbe();
