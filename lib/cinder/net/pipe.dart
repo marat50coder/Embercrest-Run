@@ -37,7 +37,7 @@ class AlertPipe {
       final initialUrl = initial == null ? null : _extract(initial.data);
       if (initialUrl != null) await _locker.stashPushUrl(initialUrl);
     } catch (error) {
-      cinderLog(() => '[CV.PING] initial message failed: $error');
+      cinderLog(() => '[BR.PING] initial message failed: $error');
     }
 
     await messaging.setForegroundNotificationPresentationOptions(
@@ -75,7 +75,7 @@ class AlertPipe {
         onTokenChanged?.call(_token!);
       }
     } catch (error) {
-      cinderLog(() => '[CV.PING] getToken failed: $error');
+      cinderLog(() => '[BR.PING] getToken failed: $error');
     }
   }
 
@@ -116,7 +116,7 @@ class AlertPipe {
     try {
       await boot();
     } catch (error) {
-      cinderLog(() => '[CV.PING] boot before offer failed: $error');
+      cinderLog(() => '[BR.PING] boot before offer failed: $error');
       return false;
     }
     final messaging = _messaging;
@@ -140,7 +140,7 @@ class AlertPipe {
     try {
       await boot();
     } catch (error) {
-      cinderLog(() => '[CV.PING] boot before ask failed: $error');
+      cinderLog(() => '[BR.PING] boot before ask failed: $error');
       return false;
     }
     if (_messaging == null) return false;

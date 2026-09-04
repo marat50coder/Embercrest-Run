@@ -54,7 +54,7 @@ class SignalBook {
         registerOnDeepLinkingCallback: true,
       );
     } catch (error) {
-      cinderLog(() => '[CV.LEDGER] init failed: $error');
+      cinderLog(() => '[BR.LEDGER] init failed: $error');
       _completeEmpty();
     }
   }
@@ -75,7 +75,7 @@ class SignalBook {
       final failed = status == 'failure' ||
           (received['af_status'] == null && received.containsKey('status'));
       cinderLog(
-        () => '[CV.LEDGER] conversion status=$status '
+        () => '[BR.LEDGER] conversion status=$status '
             'af_status=${received['af_status']} keys=${received.keys.toList()}',
       );
       if (failed) {
@@ -89,7 +89,7 @@ class SignalBook {
         _install = received;
       }
     } catch (error) {
-      cinderLog(() => '[CV.LEDGER] conversion parse error: $error');
+      cinderLog(() => '[BR.LEDGER] conversion parse error: $error');
       _install = <String, dynamic>{};
     } finally {
       if (!_installReady.isCompleted) _installReady.complete();
@@ -185,7 +185,7 @@ class SignalBook {
         }
       } catch (_) {}
     }
-    cinderLog(() => '[CV.LEDGER] payload ${jsonEncode(body)}');
+    cinderLog(() => '[BR.LEDGER] payload ${jsonEncode(body)}');
     return body;
   }
 

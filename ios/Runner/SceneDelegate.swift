@@ -3,7 +3,7 @@ import UIKit
 import UserNotifications
 
 class SceneDelegate: FlutterSceneDelegate {
-  static let launchRouteKey = "flutter.cv_wake_href"
+  static let launchRouteKey = "flutter.br_wake_href"
 
   override func scene(
     _ scene: UIScene,
@@ -24,7 +24,7 @@ class SceneDelegate: FlutterSceneDelegate {
     defaults.synchronize()
 
     #if DEBUG
-    NSLog("[CV.WAKE] captured notification destination")
+    NSLog("[BR.WAKE] captured notification destination")
     #endif
   }
 

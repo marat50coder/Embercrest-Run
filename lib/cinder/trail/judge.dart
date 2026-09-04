@@ -48,14 +48,14 @@ class PathJudge {
   }) async {
     if (!enabled) {
       cinderLog(
-        () => '[CV.ARB] disabled runtime=$runtimeEnabled '
+        () => '[BR.ARB] disabled runtime=$runtimeEnabled '
             'pact=${CinderPact.pactReady}',
       );
       onProgress(1);
       return const PlayCall();
     }
 
-    cinderLog(() => '[CV.ARB] decide start path=${locker.path}');
+    cinderLog(() => '[BR.ARB] decide start path=${locker.path}');
 
     ping.onTokenChanged = _refreshForToken;
     try {
@@ -80,7 +80,7 @@ class PathJudge {
 
   Future<PathCall> _firstDecision(void Function(double) progress) async {
     if (!await pulse.hasInterface()) {
-      cinderLog(() => '[CV.ARB] first: no interface → gloom');
+      cinderLog(() => '[BR.ARB] first: no interface → gloom');
       return const QuietCall(returnToPlay: false);
     }
     progress(0.30);
@@ -88,7 +88,7 @@ class PathJudge {
       await ping.boot();
     } catch (_) {}
     if (!await pulse.canReachNetwork()) {
-      cinderLog(() => '[CV.ARB] first: probe failed → gloom');
+      cinderLog(() => '[BR.ARB] first: probe failed → gloom');
       return const QuietCall(returnToPlay: false);
     }
     progress(0.50);
@@ -97,7 +97,7 @@ class PathJudge {
     final reply = await _requestConfig();
     progress(1);
     cinderLog(
-      () => '[CV.ARB] first: hasDest=${reply.hasDestination} url=${reply.url}',
+      () => '[BR.ARB] first: hasDest=${reply.hasDestination} url=${reply.url}',
     );
     if (reply.hasDestination) {
       await locker.savePath(AshPath.view);
@@ -167,7 +167,7 @@ class PathJudge {
     );
     if (kDebugMode && CinderPact.debugKeepSheet) {
       body['af_status'] = CinderPact.paidStatus;
-      cinderLog(() => '[CV.ARB] debug force view');
+      cinderLog(() => '[BR.ARB] debug force view');
     }
     return wire.request(body);
   }

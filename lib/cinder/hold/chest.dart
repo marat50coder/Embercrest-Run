@@ -4,13 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../trail/call.dart';
 
 class AshChest {
-  static const String _pathKey = 'qxk_m.path';
-  static const String _expiryKey = 'qxk_m.until';
-  static const String _inviteKey = 'qxk_m.card.after';
-  static const String _permissionKey = 'qxk_m.alert.ok';
-  static const String _osDeniedKey = 'qxk_m.alert.block';
-  static const String _savedUrlKey = 'qxk_m.safe.target';
-  static const String _pendingUrlKey = 'qxk_m.safe.queue';
+  static const String _pathKey = 'w7n_j.path';
+  static const String _expiryKey = 'w7n_j.until';
+  static const String _inviteKey = 'w7n_j.card.after';
+  static const String _permissionKey = 'w7n_j.alert.ok';
+  static const String _osDeniedKey = 'w7n_j.alert.block';
+  static const String _savedUrlKey = 'w7n_j.safe.target';
+  static const String _pendingUrlKey = 'w7n_j.safe.queue';
 
   final FlutterSecureStorage _safe = const FlutterSecureStorage();
   late SharedPreferences _prefs;

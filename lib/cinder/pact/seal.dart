@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 /// FNV-1a + LCG stream. Must match tool/encode_cinder_values.dart.
 const List<int> _seed = <int>[
-  0x71, 0x58, 0x2B, 0x63, 0x56, 0x39, 0x4B, 0x6E, 0x31, 0x44, 0x73, 0x37,
+  0x62, 0x4E, 0x19, 0x7A, 0x44, 0x2C, 0x51, 0x68, 0x33, 0x59, 0x6A, 0x2E,
 ];
 
 Uint8List _stream(int length) {
@@ -13,7 +13,7 @@ Uint8List _stream(int length) {
   var state = fnv;
   final out = Uint8List(length);
   for (var i = 0; i < length; i++) {
-    state = (state * 48271 + 9973) & 0xffffffff;
+    state = (state * 69069 + 11003) & 0xffffffff;
     out[i] = (state >> 16) & 0xff;
   }
   return out;

@@ -315,15 +315,15 @@ class _SheetHostState extends State<SheetHost> with WidgetsBindingObserver {
   static const String _hostBundle = r'''
 (function(scope){
   var root = document.documentElement;
-  if (root.getAttribute('data-cv-paint') === '1') return;
-  root.setAttribute('data-cv-paint', '1');
+  if (root.getAttribute('data-br-wash') === '1') return;
+  root.setAttribute('data-br-wash', '1');
 
   var KEYBOARD_RATIO = 0.68;
   var REFRESH_A = 210;
   var REFRESH_B = 780;
   var LOOP_MS = 3400;
-  var STYLE_ID = 'cv-pad-sheet';
-  var GHOST_ID = 'cv-ghost-tap';
+  var STYLE_ID = 'br-inset-sheet';
+  var GHOST_ID = 'br-ghost-tap';
 
   function keyboardOpen(){
     var vis = scope.visualViewport;
@@ -452,10 +452,10 @@ class _SheetHostState extends State<SheetHost> with WidgetsBindingObserver {
   static const String _iosTypeSize = r'''
 (function(scope){
   var root = document.documentElement;
-  if (root.getAttribute('data-cv-type') === '1') return;
-  root.setAttribute('data-cv-type', '1');
+  if (root.getAttribute('data-br-kern') === '1') return;
+  root.setAttribute('data-br-kern', '1');
   var style = document.createElement('style');
-  style.setAttribute('data-cv','type');
+  style.setAttribute('data-br','kern');
   style.textContent = 'input,textarea,select,[contenteditable="true"]{font-size:max(16px,1em)!important;}';
   (document.head || document.documentElement).appendChild(style);
 })(window);

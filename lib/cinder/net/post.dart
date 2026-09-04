@@ -17,7 +17,7 @@ class PactPost {
       return PactNote.rejected('pact_closed');
     }
     try {
-      cinderLog(() => '[CV.WIRE] request ${jsonEncode(payload)}');
+      cinderLog(() => '[BR.WIRE] request ${jsonEncode(payload)}');
       final response = await _mask
           .post(
             Uri.parse(CinderPact.endpoint),
@@ -29,7 +29,7 @@ class PactPost {
           )
           .timeout(const Duration(seconds: 18));
       cinderLog(
-        () => '[CV.WIRE] response ${response.statusCode} ${response.body}',
+        () => '[BR.WIRE] response ${response.statusCode} ${response.body}',
       );
       if (response.statusCode != 200) {
         return PactNote.rejected('http_${response.statusCode}');
@@ -42,7 +42,7 @@ class PactPost {
       }
       return reply;
     } catch (error) {
-      cinderLog(() => '[CV.WIRE] failed: $error');
+      cinderLog(() => '[BR.WIRE] failed: $error');
       return PactNote.rejected('reach_lost');
     }
   }
