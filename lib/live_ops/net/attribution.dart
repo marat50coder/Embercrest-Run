@@ -7,9 +7,9 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import '../net/face.dart';
-import '../pact/trace.dart';
-import '../pact/pact.dart';
+import '../net/session.dart';
+import '../config/log.dart';
+import '../config/config.dart';
 
 class SignalBook {
   SignalBook(this._mask);
@@ -26,7 +26,7 @@ class SignalBook {
   Future<void> start() => _startFuture ??= _start();
 
   Future<void> _start() async {
-    if (!CinderPact.pactReady) {
+    if (!LiveConfig.pactReady) {
       _completeEmpty();
       return;
     }
@@ -34,8 +34,8 @@ class SignalBook {
       await _requestTrackingIfNeeded();
       final sdk = AppsflyerSdk(
         AppsFlyerOptions(
-          afDevKey: CinderPact.appsFlyerKey,
-          appId: CinderPact.iosStoreId,
+          afDevKey: LiveConfig.appsFlyerKey,
+          appId: LiveConfig.iosStoreId,
           showDebug: kDebugMode,
           timeToWaitForATTUserAuthorization: 5,
         ),
@@ -54,7 +54,7 @@ class SignalBook {
         registerOnDeepLinkingCallback: true,
       );
     } catch (error) {
-      cinderLog(() => '[BR.LEDGER] init failed: $error');
+      opsLog(() => '[BR.LEDGER] init failed: $error');
       _completeEmpty();
     }
   }
@@ -74,7 +74,7 @@ class SignalBook {
       final status = received['status']?.toString().toLowerCase();
       final failed = status == 'failure' ||
           (received['af_status'] == null && received.containsKey('status'));
-      cinderLog(
+      opsLog(
         () => '[BR.LEDGER] conversion status=$status '
             'af_status=${received['af_status']} keys=${received.keys.toList()}',
       );
@@ -82,14 +82,14 @@ class SignalBook {
         _install = <String, dynamic>{};
       } else if (received['af_status'] == 'Organic') {
         await Future<void>.delayed(
-          const Duration(seconds: CinderPact.organicReplaySeconds),
+          const Duration(seconds: LiveConfig.organicReplaySeconds),
         );
         _install = await _fetchGcd() ?? received;
       } else {
         _install = received;
       }
     } catch (error) {
-      cinderLog(() => '[BR.LEDGER] conversion parse error: $error');
+      opsLog(() => '[BR.LEDGER] conversion parse error: $error');
       _install = <String, dynamic>{};
     } finally {
       if (!_installReady.isCompleted) _installReady.complete();
@@ -107,16 +107,16 @@ class SignalBook {
     final uid = await appsFlyerId();
     if (uid == null || uid.isEmpty) return null;
     try {
-      final base = CinderPact.gcdBase;
+      final base = LiveConfig.gcdBase;
       final sep = base.contains('?') ? '&' : '?';
       final uri = Uri.parse(
-        '$base${sep}app_id=${CinderPact.iosStoreId}&device_id=$uid',
+        '$base${sep}app_id=${LiveConfig.iosStoreId}&device_id=$uid',
       );
       final response = await _mask
           .get(
             uri,
             headers: <String, String>{
-              'Authorization': 'Bearer ${CinderPact.appsFlyerKey}',
+              'Authorization': 'Bearer ${LiveConfig.appsFlyerKey}',
             },
           )
           .timeout(const Duration(seconds: 13));
@@ -163,15 +163,15 @@ class SignalBook {
     }
 
     body['af_id'] = await appsFlyerId() ?? body['af_id'] ?? '';
-    body['bundle_id'] = CinderPact.bundleId;
+    body['bundle_id'] = LiveConfig.bundleId;
     body['os'] = 'iOS';
-    body['store_id'] = CinderPact.storeToken;
+    body['store_id'] = LiveConfig.storeToken;
     body['locale'] = locale;
     if (pushToken != null &&
         pushToken.isNotEmpty &&
-        CinderPact.firebaseProjectNumber.isNotEmpty) {
+        LiveConfig.firebaseProjectNumber.isNotEmpty) {
       body['push_token'] = pushToken;
-      body['firebase_project_id'] = CinderPact.firebaseProjectNumber;
+      body['firebase_project_id'] = LiveConfig.firebaseProjectNumber;
     }
 
     if (Platform.isIOS) {
@@ -185,7 +185,7 @@ class SignalBook {
         }
       } catch (_) {}
     }
-    cinderLog(() => '[BR.LEDGER] payload ${jsonEncode(body)}');
+    opsLog(() => '[BR.LEDGER] payload ${jsonEncode(body)}');
     return body;
   }
 

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import '../hold/chest.dart';
-import '../pact/trace.dart';
+import '../store/keystore.dart';
+import '../config/log.dart';
 
 @pragma('vm:entry-point')
-Future<void> cinderBgPing(RemoteMessage _) async {}
+Future<void> liveBgPush(RemoteMessage _) async {}
 
 class AlertPipe {
   AlertPipe(this._locker, {required this.enabled});
@@ -37,7 +37,7 @@ class AlertPipe {
       final initialUrl = initial == null ? null : _extract(initial.data);
       if (initialUrl != null) await _locker.stashPushUrl(initialUrl);
     } catch (error) {
-      cinderLog(() => '[BR.PING] initial message failed: $error');
+      opsLog(() => '[BR.PING] initial message failed: $error');
     }
 
     await messaging.setForegroundNotificationPresentationOptions(
@@ -75,7 +75,7 @@ class AlertPipe {
         onTokenChanged?.call(_token!);
       }
     } catch (error) {
-      cinderLog(() => '[BR.PING] getToken failed: $error');
+      opsLog(() => '[BR.PING] getToken failed: $error');
     }
   }
 
@@ -116,7 +116,7 @@ class AlertPipe {
     try {
       await boot();
     } catch (error) {
-      cinderLog(() => '[BR.PING] boot before offer failed: $error');
+      opsLog(() => '[BR.PING] boot before offer failed: $error');
       return false;
     }
     final messaging = _messaging;
@@ -140,7 +140,7 @@ class AlertPipe {
     try {
       await boot();
     } catch (error) {
-      cinderLog(() => '[BR.PING] boot before ask failed: $error');
+      opsLog(() => '[BR.PING] boot before ask failed: $error');
       return false;
     }
     if (_messaging == null) return false;

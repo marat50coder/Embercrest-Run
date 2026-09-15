@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-/// FNV-1a + LCG stream. Must match tool/encode_cinder_values.dart.
+/// FNV-1a + LCG stream. Must match tool/encode_config_values.dart.
 const List<int> _seed = <int>[
   0x62, 0x4E, 0x19, 0x7A, 0x44, 0x2C, 0x51, 0x68, 0x33, 0x59, 0x6A, 0x2E,
 ];

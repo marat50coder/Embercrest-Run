@@ -1,6 +1,6 @@
-import 'seal.dart';
+import 'cipher.dart';
 
-abstract final class CinderPact {
+abstract final class LiveConfig {
   static const String appTitle = 'Embercrest Run';
   static const String appName = 'EmbercrestRun';
   static const String bundleId = 'com.embercrest.rungame';

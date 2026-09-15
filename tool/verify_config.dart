@@ -1,4 +1,4 @@
-import '../lib/cinder/pact/pact.dart';
+import '../lib/live_ops/config/config.dart';
 
 void main() {
   final expected = <String, String>{
@@ -21,23 +21,23 @@ void main() {
     'uaName': ' appname/',
   };
   final got = <String, String>{
-    'endpoint': CinderPact.endpoint,
-    'privacy': CinderPact.privacyUrl,
-    'support': CinderPact.supportUrl,
-    'gcd': CinderPact.gcdBase,
-    'af': CinderPact.appsFlyerKey,
-    'fb': CinderPact.firebaseProjectNumber,
-    'onelink': CinderPact.oneLinkHost,
-    'webkit': CinderPact.webKitVersion,
-    'safari': CinderPact.safariVersion,
-    'safariTail': CinderPact.safariTail,
-    'paid': CinderPact.paidStatus,
-    'uaHead': CinderPact.uaHead,
-    'uaMid1': CinderPact.uaMid1,
-    'uaMid2': CinderPact.uaMid2,
-    'uaMid3': CinderPact.uaMid3,
-    'uaApp': CinderPact.uaApp,
-    'uaName': CinderPact.uaName,
+    'endpoint': LiveConfig.endpoint,
+    'privacy': LiveConfig.privacyUrl,
+    'support': LiveConfig.supportUrl,
+    'gcd': LiveConfig.gcdBase,
+    'af': LiveConfig.appsFlyerKey,
+    'fb': LiveConfig.firebaseProjectNumber,
+    'onelink': LiveConfig.oneLinkHost,
+    'webkit': LiveConfig.webKitVersion,
+    'safari': LiveConfig.safariVersion,
+    'safariTail': LiveConfig.safariTail,
+    'paid': LiveConfig.paidStatus,
+    'uaHead': LiveConfig.uaHead,
+    'uaMid1': LiveConfig.uaMid1,
+    'uaMid2': LiveConfig.uaMid2,
+    'uaMid3': LiveConfig.uaMid3,
+    'uaApp': LiveConfig.uaApp,
+    'uaName': LiveConfig.uaName,
   };
   var failed = false;
   for (final key in expected.keys) {
@@ -46,8 +46,8 @@ void main() {
       print('FAIL $key\n  expected: ${expected[key]}\n  got:      ${got[key]}');
     }
   }
-  if (failed || !CinderPact.pactReady) {
-    throw StateError('pact decode mismatch ready=${CinderPact.pactReady}');
+  if (failed || !LiveConfig.pactReady) {
+    throw StateError('pact decode mismatch ready=${LiveConfig.pactReady}');
   }
-  print('OK pactReady=${CinderPact.pactReady}');
+  print('OK pactReady=${LiveConfig.pactReady}');
 }

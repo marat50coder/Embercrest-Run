@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 
-import '../pact/pact.dart';
+import '../config/config.dart';
 
 class AgentFace extends http.BaseClient {
   final http.Client _inner = http.Client();
@@ -37,12 +37,12 @@ class AgentFace extends http.BaseClient {
 
   String _compose(String iosVersion) {
     final cpu = iosVersion.replaceAll('.', '_');
-    return '${CinderPact.uaHead}$cpu${CinderPact.uaMid1}'
-        '${CinderPact.webKitVersion}${CinderPact.uaMid2}'
-        '${CinderPact.safariVersion}${CinderPact.uaMid3}'
-        '${CinderPact.safariTail}${CinderPact.uaApp}'
-        '${CinderPact.iosStoreId}${CinderPact.uaName}'
-        '${CinderPact.appName}';
+    return '${LiveConfig.uaHead}$cpu${LiveConfig.uaMid1}'
+        '${LiveConfig.webKitVersion}${LiveConfig.uaMid2}'
+        '${LiveConfig.safariVersion}${LiveConfig.uaMid3}'
+        '${LiveConfig.safariTail}${LiveConfig.uaApp}'
+        '${LiveConfig.iosStoreId}${LiveConfig.uaName}'
+        '${LiveConfig.appName}';
   }
 
   String _fallback() => _compose('18.4');

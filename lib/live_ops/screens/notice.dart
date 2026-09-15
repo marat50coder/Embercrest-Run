@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../hold/chest.dart';
-import '../pact/pact.dart';
-import '../net/pipe.dart';
+import '../store/keystore.dart';
+import '../config/config.dart';
+import '../net/push.dart';
 
 class PermitCard extends StatefulWidget {
   const PermitCard({
@@ -58,7 +58,7 @@ class _PermitCardState extends State<PermitCard> {
 
   Future<void> _snooze() {
     final until = DateTime.now().millisecondsSinceEpoch ~/ 1000 +
-        CinderPact.noticeSnoozeSeconds;
+        LiveConfig.noticeSnoozeSeconds;
     return widget.locker.snoozeNotice(until);
   }
 

@@ -6,22 +6,22 @@ import 'package:flutter/services.dart';
 import '../../../core/palette.dart';
 import '../../../screens/loading_screen.dart';
 import '../../../ui/loading_mark.dart';
-import '../trail/judge.dart';
-import '../trail/call.dart';
-import 'quiet.dart';
-import 'permit.dart';
-import 'sheet.dart';
+import '../flow/router.dart';
+import '../flow/routes.dart';
+import 'offline.dart';
+import 'notice.dart';
+import 'web_host.dart';
 
-class CinderDawn extends StatefulWidget {
-  const CinderDawn({super.key, this.arbiter});
+class LiveBoot extends StatefulWidget {
+  const LiveBoot({super.key, this.arbiter});
 
   final PathJudge? arbiter;
 
   @override
-  State<CinderDawn> createState() => _CinderDawnState();
+  State<LiveBoot> createState() => _LiveBootState();
 }
 
-class _CinderDawnState extends State<CinderDawn> {
+class _LiveBootState extends State<LiveBoot> {
   PathCall? _verdict;
   bool _ready = false;
   bool _started = false;
@@ -101,7 +101,7 @@ class _CinderDawnState extends State<CinderDawn> {
         MaterialPageRoute<void>(
           builder: (_) => QuietLink(
             pulse: arbiter.pulse,
-            retryBuilder: (_) => CinderDawn(arbiter: arbiter),
+            retryBuilder: (_) => LiveBoot(arbiter: arbiter),
           ),
         ),
       );

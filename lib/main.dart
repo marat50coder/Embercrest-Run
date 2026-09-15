@@ -3,16 +3,16 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'cinder/face/dawn.dart';
-import 'cinder/hold/chest.dart';
-import 'cinder/net/book.dart';
-import 'cinder/net/face.dart';
-import 'cinder/net/pipe.dart';
-import 'cinder/net/post.dart';
-import 'cinder/net/probe.dart';
-import 'cinder/pact/pact.dart';
-import 'cinder/pact/trace.dart';
-import 'cinder/trail/judge.dart';
+import 'live_ops/screens/boot.dart';
+import 'live_ops/store/keystore.dart';
+import 'live_ops/net/attribution.dart';
+import 'live_ops/net/session.dart';
+import 'live_ops/net/push.dart';
+import 'live_ops/net/config_client.dart';
+import 'live_ops/net/probe.dart';
+import 'live_ops/config/config.dart';
+import 'live_ops/config/log.dart';
+import 'live_ops/flow/router.dart';
 import 'core/palette.dart';
 
 Future<void> main() async {
@@ -28,25 +28,25 @@ Future<void> main() async {
     mask.warm(),
   ]);
 
-  cinderLog(
-    () => '[BR.BOOT] pactReady=${CinderPact.pactReady} '
-        'endpoint=${CinderPact.endpoint} '
-        'afKeyLen=${CinderPact.appsFlyerKey.length} '
-        'fbNum=${CinderPact.firebaseProjectNumber}',
+  opsLog(
+    () => '[BR.BOOT] pactReady=${LiveConfig.pactReady} '
+        'endpoint=${LiveConfig.endpoint} '
+        'afKeyLen=${LiveConfig.appsFlyerKey.length} '
+        'fbNum=${LiveConfig.firebaseProjectNumber}',
   );
 
   var productionServicesReady = false;
-  if (CinderPact.pactReady) {
+  if (LiveConfig.pactReady) {
     try {
       await Firebase.initializeApp();
-      FirebaseMessaging.onBackgroundMessage(cinderBgPing);
+      FirebaseMessaging.onBackgroundMessage(liveBgPush);
       productionServicesReady = true;
-      cinderLog(() => '[BR.BOOT] Firebase.initializeApp OK');
+      opsLog(() => '[BR.BOOT] Firebase.initializeApp OK');
     } catch (error) {
-      cinderLog(() => '[BR.BOOT] Firebase.initializeApp failed: $error');
+      opsLog(() => '[BR.BOOT] Firebase.initializeApp failed: $error');
     }
   } else {
-    cinderLog(() => '[BR.BOOT] pact closed — native play only.');
+    opsLog(() => '[BR.BOOT] pact closed — native play only.');
   }
 
   final pulse = ReachProbe();
@@ -59,7 +59,7 @@ Future<void> main() async {
     wire: PactPost(mask, locker),
     ping: ping,
     mask: mask,
-    runtimeEnabled: CinderPact.pactReady,
+    runtimeEnabled: LiveConfig.pactReady,
   );
 
   runApp(EmbercrestApp(arbiter: arbiter));
@@ -92,7 +92,7 @@ class EmbercrestApp extends StatelessWidget {
           },
         ),
       ),
-      home: CinderDawn(arbiter: arbiter),
+      home: LiveBoot(arbiter: arbiter),
     );
   }
 }

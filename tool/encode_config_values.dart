@@ -2,7 +2,7 @@
 
 import 'dart:typed_data';
 
-/// FNV-1a seed + LCG stream. Keep in sync with lib/cinder/pact/seal.dart.
+/// FNV-1a seed + LCG stream. Keep in sync with lib/live_ops/config/cipher.dart.
 const List<int> _seed = <int>[
   0x62, 0x4E, 0x19, 0x7A, 0x44, 0x2C, 0x51, 0x68, 0x33, 0x59, 0x6A, 0x2E,
 ];

@@ -117,7 +117,10 @@ class Audio with WidgetsBindingObserver {
       } catch (e) {
         // A clip failing to pre-cache is never worth breaking startup over,
         // but a silent miss here is how a whole soundtrack goes missing.
-        debugPrint('audio: could not preload ${_path(n)} ($e)');
+        assert(() {
+          debugPrint('audio: could not preload ${_path(n)} ($e)');
+          return true;
+        }());
       }
     }
   }

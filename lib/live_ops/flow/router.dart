@@ -3,16 +3,16 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../net/book.dart';
-import '../hold/chest.dart';
-import '../net/face.dart';
-import '../pact/trace.dart';
-import '../pact/pact.dart';
-import '../net/pipe.dart';
+import '../net/attribution.dart';
+import '../store/keystore.dart';
+import '../net/session.dart';
+import '../config/log.dart';
+import '../config/config.dart';
+import '../net/push.dart';
 import '../net/probe.dart';
-import 'call.dart';
-import '../hold/href.dart';
-import '../net/post.dart';
+import 'routes.dart';
+import '../store/deeplink.dart';
+import '../net/config_client.dart';
 
 class PathJudge {
   PathJudge({
@@ -33,7 +33,7 @@ class PathJudge {
   final AgentFace mask;
   final bool runtimeEnabled;
 
-  bool get enabled => runtimeEnabled && CinderPact.pactReady;
+  bool get enabled => runtimeEnabled && LiveConfig.pactReady;
 
   Future<PathCall>? _decideFuture;
 
@@ -47,15 +47,15 @@ class PathJudge {
     required void Function(double value) onProgress,
   }) async {
     if (!enabled) {
-      cinderLog(
+      opsLog(
         () => '[BR.ARB] disabled runtime=$runtimeEnabled '
-            'pact=${CinderPact.pactReady}',
+            'pact=${LiveConfig.pactReady}',
       );
       onProgress(1);
       return const PlayCall();
     }
 
-    cinderLog(() => '[BR.ARB] decide start path=${locker.path}');
+    opsLog(() => '[BR.ARB] decide start path=${locker.path}');
 
     ping.onTokenChanged = _refreshForToken;
     try {
@@ -80,7 +80,7 @@ class PathJudge {
 
   Future<PathCall> _firstDecision(void Function(double) progress) async {
     if (!await pulse.hasInterface()) {
-      cinderLog(() => '[BR.ARB] first: no interface → gloom');
+      opsLog(() => '[BR.ARB] first: no interface → gloom');
       return const QuietCall(returnToPlay: false);
     }
     progress(0.30);
@@ -88,7 +88,7 @@ class PathJudge {
       await ping.boot();
     } catch (_) {}
     if (!await pulse.canReachNetwork()) {
-      cinderLog(() => '[BR.ARB] first: probe failed → gloom');
+      opsLog(() => '[BR.ARB] first: probe failed → gloom');
       return const QuietCall(returnToPlay: false);
     }
     progress(0.50);
@@ -96,7 +96,7 @@ class PathJudge {
     progress(0.74);
     final reply = await _requestConfig();
     progress(1);
-    cinderLog(
+    opsLog(
       () => '[BR.ARB] first: hasDest=${reply.hasDestination} url=${reply.url}',
     );
     if (reply.hasDestination) {
@@ -165,9 +165,9 @@ class PathJudge {
       locale: Platform.localeName.replaceAll('-', '_'),
       pushToken: token ?? ping.token,
     );
-    if (kDebugMode && CinderPact.debugKeepSheet) {
-      body['af_status'] = CinderPact.paidStatus;
-      cinderLog(() => '[BR.ARB] debug force view');
+    if (kDebugMode && LiveConfig.debugKeepSheet) {
+      body['af_status'] = LiveConfig.paidStatus;
+      opsLog(() => '[BR.ARB] debug force view');
     }
     return wire.request(body);
   }
