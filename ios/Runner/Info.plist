@@ -33,6 +33,11 @@
 		<string>tel</string>
 		<string>mailto</string>
 	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Your device identifier helps us understand which campaigns bring runners to Embercrest Run.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
