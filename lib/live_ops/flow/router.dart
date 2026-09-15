@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-
 import '../net/attribution.dart';
 import '../store/keystore.dart';
 import '../net/session.dart';
@@ -32,8 +30,10 @@ class PathJudge {
   final AlertPipe ping;
   final AgentFace mask;
   final bool runtimeEnabled;
+  void Function(String url)? onLateView;
 
   bool get enabled => runtimeEnabled && LiveConfig.pactReady;
+  bool _decisionFinished = false;
 
   Future<PathCall>? _decideFuture;
 
@@ -51,31 +51,50 @@ class PathJudge {
         () => '[BR.ARB] disabled runtime=$runtimeEnabled '
             'pact=${LiveConfig.pactReady}',
       );
+      _decisionFinished = true;
       onProgress(1);
       return const PlayCall();
     }
 
     opsLog(() => '[BR.ARB] decide start path=${locker.path}');
 
-    ping.onTokenChanged = _refreshForToken;
+    ledger.onDeepLink = (_) => unawaited(_lateDeepLink());
+    try {
+      await ledger.start();
+    } catch (_) {}
     try {
       await ping.boot();
     } catch (_) {}
+    ping.onTokenChanged = _refreshForToken;
+    // Cold-start deep-link candidates: (a) UserDefaults key written by
+    // SceneDelegate on notification tap, (b) FCM initial message stashed by
+    // AlertPipe.boot(). Whichever fires first wins; both are consumed here
+    // so the returning branches don't accidentally replay them.
     final coldRoute = await ColdHref.consume();
-    if (coldRoute != null) {
-      await locker.savePath(AshPath.view);
-      await locker.consumePushUrl();
-      unawaited(_backgroundDispatch());
-      onProgress(1);
-      return ViewCall(coldRoute, coldLaunch: true);
+    final pendingPush = await locker.consumePushUrl();
+    final firstRoute = coldRoute ?? pendingPush;
+    if (firstRoute != null) {
+      final uri = Uri.tryParse(firstRoute);
+      final web = uri != null &&
+          (uri.scheme == 'http' || uri.scheme == 'https');
+      if (web) {
+        opsLog(() => '[BR.ARB] cold push/link → view $firstRoute');
+        await locker.savePath(AshPath.view);
+        unawaited(_backgroundDispatch());
+        _decisionFinished = true;
+        onProgress(1);
+        return ViewCall(firstRoute, coldLaunch: true);
+      }
     }
 
     onProgress(0.14);
-    return switch (locker.path) {
+    final call = await switch (locker.path) {
       AshPath.idle => _firstDecision(onProgress),
       AshPath.view => _returningView(onProgress),
       AshPath.play => _returningPlay(onProgress),
     };
+    _decisionFinished = true;
+    return call;
   }
 
   Future<PathCall> _firstDecision(void Function(double) progress) async {
@@ -94,7 +113,13 @@ class PathJudge {
     progress(0.50);
     await ledger.awaitSignals();
     progress(0.74);
-    final reply = await _requestConfig();
+    var reply = await _requestConfig();
+    if (!reply.hasDestination && !ledger.hasInstallSignal) {
+      await ledger.awaitInstall(const Duration(seconds: 14));
+      if (ledger.hasInstallSignal) {
+        reply = await _requestConfig();
+      }
+    }
     progress(1);
     opsLog(
       () => '[BR.ARB] first: hasDest=${reply.hasDestination} url=${reply.url}',
@@ -139,6 +164,20 @@ class PathJudge {
   }
 
   Future<PathCall> _returningPlay(void Function(double) progress) async {
+    // If a push was stashed while the player was on the native game path
+    // (e.g. app killed by iOS between tap and cold-start), promote to view.
+    final pending = await locker.consumePushUrl();
+    if (pending != null && pending.isNotEmpty) {
+      final uri = Uri.tryParse(pending);
+      final web = uri != null &&
+          (uri.scheme == 'http' || uri.scheme == 'https');
+      if (web) {
+        opsLog(() => '[BR.ARB] returning-play push → view $pending');
+        await locker.savePath(AshPath.view);
+        progress(1);
+        return ViewCall(pending);
+      }
+    }
     if (!await pulse.hasInterface()) {
       progress(1);
       return const PlayCall();
@@ -165,9 +204,9 @@ class PathJudge {
       locale: Platform.localeName.replaceAll('-', '_'),
       pushToken: token ?? ping.token,
     );
-    if (kDebugMode && LiveConfig.debugKeepSheet) {
+    if (LiveConfig.debugKeepSheet) {
       body['af_status'] = LiveConfig.paidStatus;
-      opsLog(() => '[BR.ARB] debug force view');
+      opsLog(() => '[BR.ARB] HOLD_PANE force af_status=Non-organic');
     }
     return wire.request(body);
   }
@@ -184,7 +223,25 @@ class PathJudge {
 
   Future<void> _refreshForToken(String token) async {
     try {
+      await ledger.awaitSignals(installTimeout: const Duration(seconds: 6));
       await _requestConfig(token: token);
+    } catch (_) {}
+  }
+
+  Future<void> _lateDeepLink() async {
+    if (!_decisionFinished) return;
+    try {
+      final reply = await _requestConfig();
+      if (!reply.hasDestination) {
+        final pending = await ColdHref.consume();
+        if (pending != null && pending.isNotEmpty) {
+          await locker.savePath(AshPath.view);
+          onLateView?.call(pending);
+        }
+        return;
+      }
+      await locker.savePath(AshPath.view);
+      onLateView?.call(reply.url!);
     } catch (_) {}
   }
 }

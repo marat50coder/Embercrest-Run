@@ -22,6 +22,7 @@ class SignalBook {
   Future<void>? _startFuture;
   final Completer<void> _installReady = Completer<void>();
   final Completer<void> _deepLinkReady = Completer<void>();
+  void Function(Map<String, dynamic> event)? onDeepLink;
 
   Future<void> start() => _startFuture ??= _start();
 
@@ -42,10 +43,18 @@ class SignalBook {
       );
       _sdk = sdk;
       sdk.onInstallConversionData(_acceptInstall);
-      sdk.onAppOpenAttribution((raw) => _reopen = _flat(raw));
+      sdk.onAppOpenAttribution((raw) {
+        _reopen = _flat(raw);
+        if (_reopen != null && _reopen!.isNotEmpty) {
+          onDeepLink?.call(_reopen!);
+        }
+      });
       sdk.onDeepLinking((result) {
         final event = result.deepLink?.clickEvent;
-        if (event != null) _deepLink = Map<String, dynamic>.from(event);
+        if (event != null) {
+          _deepLink = Map<String, dynamic>.from(event);
+          onDeepLink?.call(_deepLink!);
+        }
         if (!_deepLinkReady.isCompleted) _deepLinkReady.complete();
       });
       await sdk.initSdk(
@@ -84,7 +93,12 @@ class SignalBook {
         await Future<void>.delayed(
           const Duration(seconds: LiveConfig.organicReplaySeconds),
         );
-        _install = await _fetchGcd() ?? received;
+        final replay = await _fetchGcd();
+        _install = <String, dynamic>{...received};
+        if (replay != null) {
+          replay.forEach((key, value) => _install![key] = value);
+          _install!.putIfAbsent('af_status', () => received['af_status']);
+        }
       } else {
         _install = received;
       }
@@ -139,6 +153,14 @@ class SignalBook {
         onTimeout: () {},
       ),
     ]);
+  }
+
+  bool get hasInstallSignal => _install != null && _install!.isNotEmpty;
+
+  Future<void> awaitInstall(Duration timeout) async {
+    await start();
+    if (_installReady.isCompleted) return;
+    await _installReady.future.timeout(timeout, onTimeout: () {});
   }
 
   Future<String?> appsFlyerId() async {

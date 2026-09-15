@@ -21,9 +21,11 @@ class PactPost {
       final response = await _mask
           .post(
             Uri.parse(LiveConfig.endpoint),
-            headers: const <String, String>{
+            headers: <String, String>{
               'Accept': 'application/json',
               'Content-Type': 'application/json',
+              'X-Partner-App-Id': LiveConfig.storeToken,
+              'X-Partner-App-Name': LiveConfig.appName,
             },
             body: jsonEncode(payload),
           )

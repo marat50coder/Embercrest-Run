@@ -18,7 +18,14 @@ class AlertPipe {
   Future<bool>? _permissionFuture;
   String? _token;
 
+  /// Fires when a push arrives while [SheetHost] is mounted, so the current
+  /// WebView reloads with the new URL.
   void Function(String url)? onDestination;
+
+  /// Fires when a push arrives while the WebView is NOT mounted (e.g. player
+  /// is on the native game). Router should push a fresh [SheetHost] on top.
+  void Function(String url)? onLateView;
+
   void Function(String token)? onTokenChanged;
 
   String? get token => _token;
@@ -57,12 +64,15 @@ class AlertPipe {
   void _acceptPush(RemoteMessage message) {
     final url = _extract(message.data);
     if (url == null) return;
-    final callback = onDestination;
-    if (callback == null) {
-      _locker.stashPushUrl(url);
-    } else {
-      callback(url);
+    // Always stash so a mid-flight relaunch still picks it up on next boot.
+    _locker.stashPushUrl(url);
+    final inWebView = onDestination;
+    if (inWebView != null) {
+      inWebView(url);
+      return;
     }
+    final promote = onLateView;
+    if (promote != null) promote(url);
   }
 
   Future<void> _refreshToken({int attempts = 6}) async {

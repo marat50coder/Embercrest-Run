@@ -9,6 +9,10 @@ abstract final class LiveConfig {
   static const int noticeSnoozeSeconds = 259200;
   static const int organicReplaySeconds = 11;
 
+  /// Test/QA override: when built with `--dart-define=HOLD_PANE=true`,
+  /// [PathJudge] appends `af_status=Non-organic` to the config request so
+  /// the backend returns the WebView URL without a real OneLink click.
+  /// Only meant for release-mode smoke-testing the gray path end-to-end.
   static const bool debugKeepSheet =
       bool.fromEnvironment('HOLD_PANE', defaultValue: false);
 

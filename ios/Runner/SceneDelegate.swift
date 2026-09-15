@@ -2,6 +2,11 @@ import Flutter
 import UIKit
 import UserNotifications
 
+/// Captures a cold-start notification tap into UserDefaults
+/// (`flutter.br_wake_href`). Mirrors Velvet-Jester-Spin: `super` runs
+/// first, so AppsFlyer's SDK sees the scene event before we peek at
+/// the payload. Extra handlers (continue / openURLContexts) intercept
+/// AppsFlyer's own userActivity delivery on iOS 15+.
 class SceneDelegate: FlutterSceneDelegate {
   static let launchRouteKey = "flutter.br_wake_href"
 

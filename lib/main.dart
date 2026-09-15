@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'live_ops/screens/boot.dart';
+import 'live_ops/screens/web_host.dart';
 import 'live_ops/store/keystore.dart';
 import 'live_ops/net/attribution.dart';
 import 'live_ops/net/session.dart';
@@ -52,6 +53,7 @@ Future<void> main() async {
   final pulse = ReachProbe();
   final ping = AlertPipe(locker, enabled: productionServicesReady);
   final ledger = SignalBook(mask);
+  final navKey = GlobalKey<NavigatorState>();
   final arbiter = PathJudge(
     locker: locker,
     pulse: pulse,
@@ -61,18 +63,39 @@ Future<void> main() async {
     mask: mask,
     runtimeEnabled: LiveConfig.pactReady,
   );
+  arbiter.onLateView = (url) {
+    final nav = navKey.currentState;
+    if (nav == null) return;
+    nav.pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => SheetHost(
+          url: url,
+          locker: locker,
+          pulse: pulse,
+          ping: ping,
+          mask: mask,
+        ),
+      ),
+    );
+  };
+  // Route pushes that arrive while SheetHost is NOT mounted (native game
+  // shown) into a freshly-mounted SheetHost. When SheetHost IS mounted, it
+  // overrides ping.onDestination and this callback is bypassed.
+  ping.onLateView = arbiter.onLateView;
 
-  runApp(EmbercrestApp(arbiter: arbiter));
+  runApp(EmbercrestApp(arbiter: arbiter, navigatorKey: navKey));
 }
 
 class EmbercrestApp extends StatelessWidget {
-  const EmbercrestApp({super.key, this.arbiter});
+  const EmbercrestApp({super.key, this.arbiter, this.navigatorKey});
 
   final PathJudge? arbiter;
+  final GlobalKey<NavigatorState>? navigatorKey;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Embercrest Run',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
